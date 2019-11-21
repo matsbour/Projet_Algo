@@ -1,15 +1,14 @@
 #include "handle_database.h"
 #include <cstring>
 
-//Main prend un argument le chemin vers la database.psq et .phr
+//Main prend un argument le chemin vers la database
 
-void display_header(Handle_Database* database) // Permet d afficher le header de la prot suivante
+void display_vector(const vector<char>* subject)
 {
-	database->update_next_protein_header();
-	for(int i=0; i<database->get_prot_header_active()->size();++i)
+	for(unsigned int i=0; i<subject->size();++i)
 	{
 		if(i%80==0){cout << endl;}
-		cout << database->get_prot_header_active()->at(i) ;
+		cout << subject->at(i) ;
 	}
 	cout << endl;
 }
@@ -17,12 +16,13 @@ void display_header(Handle_Database* database) // Permet d afficher le header de
 int main(int argc, char* argv[])
 {
 	Handle_Database* database = new Handle_Database(argv[1]);
-	database->update_next_protein_sequence();
 	
-	for(int i=0; i<10; ++i)
-	{
-		display_header(database);
-	}
+	cout << endl << "From fetch : "<< endl ;
+	database->fetch_prot_header(150);
+	database->fetch_prot_sequence(150);
+	display_vector(database->get_prot_header_active());
+	display_vector(database->get_prot_active());
+	
 	
 	delete database ;
 	return 0 ;
