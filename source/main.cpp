@@ -1,5 +1,6 @@
 #include "handle_database.h"
 #include <cstring>
+#include "myProtein.h"
 
 //Main prend un argument le chemin vers la database
 
@@ -28,4 +29,17 @@ int main(int argc, char* argv[])
 	return 0 ;
 }
 
+
+int main() 
+{ 
+    // Creating object of the class 
+    myProtein object ; 
+  
+    // Extracting the header 
+   cout << object.header << endl;
+   cout << object.sequence << endl;
+
+  
+    return 0; 
+}
 
