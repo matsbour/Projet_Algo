@@ -14,6 +14,7 @@ class myProtein {
 	 
 	string getSequence() const;
 	string getHeader() const;
+	int getSize() const;
 	
 	private:
 
@@ -21,6 +22,7 @@ class myProtein {
 	// Instance variables 
 	string header;
 	string sequence;
+	int size;
    
 
 	// Function declaration of output_header() to extract header from file Data Base 
