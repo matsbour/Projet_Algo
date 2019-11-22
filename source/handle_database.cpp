@@ -24,6 +24,8 @@ Handle_Database::Handle_Database(const string database_path)
 	this->header_offset_vector = new vector<int>;
 	this->sequence_offset_vector = new vector<int>;
 	this->generate_prot_index(database_path+".pin");
+	this->sequence_stream.open(database_path+".psq", std::ifstream::binary);
+	this->header_stream.open(database_path+".phr", std::ifstream::binary);
 }
 
 Handle_Database::~Handle_Database()
@@ -36,6 +38,8 @@ Handle_Database::~Handle_Database()
 	delete this->timestamp;
 	delete this->header_offset_vector;
 	delete this->sequence_offset_vector;
+	this->sequence_stream.close();
+	this->header_stream.close();
 }
 
 char* Handle_Database::read_file(const string filepath)
@@ -60,6 +64,20 @@ char* Handle_Database::read_file(const string filepath)
 
 const vector<char>* Handle_Database::get_prot_active(){return this->prot_active;}
 const vector<char>* Handle_Database::get_prot_header_active(){return this->prot_header_active;}
+const unsigned int Handle_Database::get_database_size(){return this->sequence_offset_vector->size();}
+const unsigned int Handle_Database::get_size_sequence_prot(const unsigned int index)
+{
+	if(index <(this->sequence_offset_vector->size())-1)
+	{
+		return (unsigned int)(this->sequence_offset_vector->at(index+1) - this->sequence_offset_vector->at(index))-1 ;
+	}
+	else
+	{
+		cout << "Out of bound : " << index << " size limit : " << (this->sequence_offset_vector->size()-1) << endl ;
+		exit(1);
+	}
+	return 0;
+	}
 
 //Remplis tous les attributs necessaie depuis le fichier .pin
 void Handle_Database::generate_prot_index(string filepath)
@@ -114,8 +132,6 @@ void Handle_Database::generate_prot_index(string filepath)
 			file.read((char*)&(header_offset[i]),sizeof(uint32_t));
 			header_offset_vector->push_back((int)__builtin_bswap32(header_offset[i]));
 		}
-		cout<<"Header_offset0:  " << (int)header_offset_vector->at(0)<<endl;
-		cout<<"Header_offset1:  " << (int)header_offset_vector->at(1)<<endl;
 	
 		u_int32_t* sequence_offset = new u_int32_t[(int)numbers_of_sequence+1] ; // Tableau d offset representant l ecart entre chaque sequence
 		for(int i=0; i<(int)numbers_of_sequence+1;++i)
@@ -123,9 +139,6 @@ void Handle_Database::generate_prot_index(string filepath)
 			file.read((char*)&(sequence_offset[i]),sizeof(uint32_t));
 			sequence_offset_vector->push_back((int)__builtin_bswap32(sequence_offset[i]));
 		}
-		cout<<"Sequence_offset0:  " << (int)sequence_offset_vector->at(0)<<endl;
-		cout<<"Sequence_offset1:  " << (int)sequence_offset_vector->at(1)<<endl;
-		cout<<"Sequence_offsetN:  " << (int)sequence_offset_vector->at((int)numbers_of_sequence)<<endl;
 		
 		delete header_offset;
 		delete sequence_offset;
@@ -145,14 +158,12 @@ void Handle_Database::fetch_prot_sequence(const unsigned int index)
 	unsigned int length = (int)this->sequence_offset_vector->at(index+1) - (int)this->sequence_offset_vector->at(index);
 	--length; //le dernier byte est un byte null
 	string filepath = (this->database_path_saved+".psq");
-	ifstream file(filepath, std::ifstream::binary);
 	char* char_container = NULL; // Servira a cree la zone memoire a retourne
-	if(file.is_open())
+	if(sequence_stream.is_open())
 	{
-		file.seekg((int)this->sequence_offset_vector->at(index),file.beg);
+		sequence_stream.seekg((int)this->sequence_offset_vector->at(index),sequence_stream.beg);
 		char_container = new char [length] ; //servira a stocke tous les char du fichier
-		file.read(char_container,length);
-		file.close();
+		sequence_stream.read(char_container,length);
 	}
 	else{
 	cout<<"Cannot open file "<< this->database_path_saved << ".psq" <<endl;
@@ -179,13 +190,11 @@ void Handle_Database::fetch_prot_header(const unsigned int index)
 	unsigned int length = (int)this->header_offset_vector->at(index+1) - (int)this->header_offset_vector->at(index);
 	cout << "Length :" << length << endl;
 	string filepath = (this->database_path_saved+".phr");
-	ifstream file_phr(filepath, std::ifstream::binary);
 	char* char_container = new char [length]; // servira a stocke tous les char du fichier
-	if(file_phr.is_open())
+	if(header_stream.is_open())
 	{
-		file_phr.seekg((int)this->header_offset_vector->at(index),file_phr.beg);
-		file_phr.read(char_container,length/sizeof(char));
-		file_phr.close();
+		header_stream.seekg((int)this->header_offset_vector->at(index),header_stream.beg);
+		header_stream.read(char_container,length/sizeof(char));  //?
 	}
 	else{
 	cout<<"Cannot open file "<< filepath <<endl;
