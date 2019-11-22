@@ -8,6 +8,7 @@ myProtein::myProtein()
 	//header = " " ;
 	header = output_header();
 	sequence = output_sequence();
+	size=sequence.size();
 }
 	
 
@@ -17,6 +18,8 @@ myProtein::myProtein()
 	string myProtein::getSequence() const{return sequence;}
 	
 	string myProtein::getHeader() const{return header;}
+
+	int myProtein::getSize() const{return size;}
 	 
 
 // Function definition of output_header() to extract header from file Data Base 
