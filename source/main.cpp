@@ -1,7 +1,8 @@
 #include "handle_database.h"
+#include "myProtein.h"
 #include <cstring>
 
-//Main prend un argument le chemin vers la database
+//Main prend un argument le chemin vers la database et vers la query 
 
 void display_vector(const vector<char>* subject)
 {
@@ -14,6 +15,7 @@ void display_vector(const vector<char>* subject)
 	cout << endl;
 }
 
+//Comparaison
 int compare_prot(int protlen,const string *protein,const vector<char>*dataprot){
 	if (protlen ==1){
 		if (protein->at(0)==dataprot->at(0))
@@ -42,45 +44,39 @@ int compare_prot(int protlen,const string *protein,const vector<char>*dataprot){
 	}
 }
 
-int main(int argc, char* argv[])
+
+int main(int argc, char* argv[]) // main de mi_parcours
 {
 	Handle_Database* database = new Handle_Database(argv[1]);
+	myProtein* prot_query =  new myProtein(argv[2]);
 	
-	string prot_sequence_query = "RRPARSGGDGGAPMTTGSRVVKYYDGSRRGSRRGLSTSGRSVKKDPAGLRDSLLSEDDRSAAAAPPPPPVHPVRDQLSSQLVRPSRGLGAYRTMSVFGSGWRPCRAAASHVRGAR";
-	unsigned int length = prot_sequence_query.size();
+	string prot_sequence_query = prot_query->getSequence();
+	unsigned int length = prot_query->getSize();
 	bool is_same = false ;
-	bool is_different = false ;
-	
 	
 	for(unsigned int i =0; i<database->get_database_size();++i)
 	{
 		if(database->get_size_sequence_prot(i) == prot_sequence_query.size())
 		{
-			/*
-			database->fetch_prot_sequence(i); // on met a jour prot_active afin de contenir la i eme
-			is_same = compare_prot(length, &prot_sequence_query, database->get_prot_active());
-			*/
-			is_different = false ;
-			database->fetch_prot_sequence(i); // on met a jour prot_active afin de contenir la i eme
-			for(unsigned int j=0; j<length; ++j)
-			{
-				if(database->get_prot_active()->at(j) != prot_sequence_query[j])
-				{
-					is_different = true ;
-					break;
-				}
-			}
 			
-			if(!is_different)
+			database->fetch_prot_sequence(i); // on met a jour prot_active afin de contenir la i eme
+			is_same = compare_prot(length, &prot_sequence_query, database->get_prot_active()); //Compare le proteines
+			
+			if(is_same)
 			{
 				cout << "Trouve index : " << i << endl ;
+				database->fetch_prot_header(i);
+				for(unsigned int i=0;i<database->get_prot_header_active()->size();++i){cout << database->get_prot_header_active()->at(i);}
+				cout << endl;
 				break ;
 			}
 		}
 	}
 	
+	if(!is_same){cout << "Protein non trouve" << endl;}
+	
 	delete database ;
+	delete prot_query;
 	return 0 ;
 }
-
 

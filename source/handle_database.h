@@ -17,18 +17,13 @@ private :
 	//Attribut
 	string database_path_saved ;
 	//Attribut sequence
-	ifstream sequence_stream ;
-	char* prot_sequence ; //Contiendra toute la database psq
-	int index_prot_sequence; //Permet de se souvenir a quelle proteine nous sommes
+	char* database_prot_sequence ; //Contiendra toute la database psq
 	vector<char>* prot_active; //Contiendra la protein lu en cours
 	map<int,char> prot_dictionnary ; //Dictionnaire pour lire le fichier binaire cree apr BLAST
 	
 	//Attribut header
-	ifstream header_stream ;
-	char* prot_header; //Contiendra la database phr
-	int index_prot_header;
+	char* database_prot_header; //Contiendra la database phr
 	vector<char>* prot_header_active;
-	
 	map<char,int> hex2int_map ;
 	
 	//Attribut index
@@ -47,7 +42,7 @@ private :
 	//Fonction
 	char* read_file(const string filepath);//Function utilitaire
 	void generate_prot_index(const string filepath);
-	unsigned int number_of_character(unsigned int* position_in_header,string first_byte, char* prot_header);
+	unsigned int number_of_character(unsigned int* position_in_header,string first_byte);
 	
 public :
 	Handle_Database(const string database_path) ;

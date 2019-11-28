@@ -2,11 +2,11 @@
 
 Handle_Database::Handle_Database(const string database_path)
 {
-	this->database_path_saved = database_path;
-	this->index_prot_sequence = 0; //1 Car le premier character est '-'
-	this->index_prot_header = 0; 
+	this->database_path_saved = database_path; // sauvegarde le chemin d acces
 	this->prot_active = new vector<char>; //Cree sur le tas
 	this->prot_header_active = new vector<char>;
+	this->database_prot_sequence = NULL;
+	this->database_prot_header = NULL;
 	this->prot_dictionnary ={
 		{0,'-'}, {1,'A'}, {2,'B'},{3,'C'},{4,'D'},
 		{5,'E'}, {6,'F'}, {7,'G'},{8,'H'},{9,'I'},
@@ -24,28 +24,26 @@ Handle_Database::Handle_Database(const string database_path)
 	this->header_offset_vector = new vector<int>;
 	this->sequence_offset_vector = new vector<int>;
 	this->generate_prot_index(database_path+".pin");
-	this->sequence_stream.open(database_path+".psq", std::ifstream::binary);
-	this->header_stream.open(database_path+".phr", std::ifstream::binary);
+	this->database_prot_sequence = this->read_file(database_path+".psq");
+	this->database_prot_header = this->read_file(database_path+".phr");
 }
 
 Handle_Database::~Handle_Database()
 {
 	delete this->prot_active;
-	delete this->prot_sequence;
-	delete this->prot_header;
+	delete this->database_prot_sequence;
+	delete this->database_prot_header;
 	delete this->prot_header_active;
 	delete this->title;
 	delete this->timestamp;
 	delete this->header_offset_vector;
 	delete this->sequence_offset_vector;
-	this->sequence_stream.close();
-	this->header_stream.close();
 }
 
 char* Handle_Database::read_file(const string filepath)
 {
-	ifstream file(filepath, std::ifstream::binary);
-	char* char_container = NULL; // Servira a cree la zone memoire a retourne
+	ifstream file(filepath, ios::in | ios::binary);
+	char* char_container = NULL;
 	if(file.is_open())
 	{
 		file.seekg(0,file.end);
@@ -157,25 +155,13 @@ void Handle_Database::fetch_prot_sequence(const unsigned int index)
 	
 	unsigned int length = (int)this->sequence_offset_vector->at(index+1) - (int)this->sequence_offset_vector->at(index);
 	--length; //le dernier byte est un byte null
-	string filepath = (this->database_path_saved+".psq");
-	char* char_container = NULL; // Servira a cree la zone memoire a retourne
-	if(sequence_stream.is_open())
-	{
-		sequence_stream.seekg((int)this->sequence_offset_vector->at(index),sequence_stream.beg);
-		char_container = new char [length] ; //servira a stocke tous les char du fichier
-		sequence_stream.read(char_container,length);
-	}
-	else{
-	cout<<"Cannot open file "<< this->database_path_saved << ".psq" <<endl;
-	exit(1);}
 	
 	this->prot_active->clear() ;
+	unsigned int position_start =(unsigned int)this->sequence_offset_vector->at(index);
 	for(unsigned int i=0; i<length;++i)
 	{
-		prot_active->push_back(prot_dictionnary[(int)char_container[i]]);
+		prot_active->push_back(prot_dictionnary[(int)this->database_prot_sequence[i+position_start]]);
 	}
-	this->index_prot_sequence = index;
-	delete char_container;
 	
 }
 
@@ -183,53 +169,39 @@ void Handle_Database::fetch_prot_header(const unsigned int index)
 {
 	if(index >= this->header_offset_vector->size()) // on verifie si on a un numero de prot trop grand
 	{
-		cout<<"Index is out of bound for sequence_offset" << endl;
+		cout<<"Index is out of bound for header_offset" << endl;
 		exit(1);
 	}
 	
 	unsigned int length = (int)this->header_offset_vector->at(index+1) - (int)this->header_offset_vector->at(index);
-	cout << "Length :" << length << endl;
-	string filepath = (this->database_path_saved+".phr");
-	char* char_container = new char [length]; // servira a stocke tous les char du fichier
-	if(header_stream.is_open())
-	{
-		header_stream.seekg((int)this->header_offset_vector->at(index),header_stream.beg);
-		header_stream.read(char_container,length/sizeof(char));  //?
-	}
-	else{
-	cout<<"Cannot open file "<< filepath <<endl;
-	exit(1);}
-	
 	this->prot_header_active->clear() ;
 	unsigned int size_of_visible_string = 0 ;
 	unsigned int int_test = 0;
 	unsigned int position_start_string = 0 ;
+	unsigned int position_start = (unsigned int)this->header_offset_vector->at(index) ;
 	std::stringstream stream;
-	for(unsigned int i=0; i< length;++i )
+	for(unsigned int i=position_start; i< length+position_start;++i )
 	{
-		int_test = (unsigned int) (u_int8_t)char_container[i];
+		int_test = (unsigned int) (u_int8_t)database_prot_header[i];
 		if(int_test == 26) // Car 1A = 26, on ignore les premier byte designant les types
 		{
-			int_test = (unsigned int) (u_int8_t)char_container[i+1];
+			int_test = (unsigned int) (u_int8_t)database_prot_header[i+1];
 			stream << std::hex << int_test;
-			size_of_visible_string = this->number_of_character(&i,stream.str(),char_container) ;
+			size_of_visible_string = this->number_of_character(&i,stream.str()) ;
 			position_start_string = i+2;// si on dit que le premier hex ne peut pas depasser 8 
 			stream.str(string()); //vide le stream
 			break;
 		}
 	}
-	
+
 	for(unsigned int j=position_start_string; j<=position_start_string+size_of_visible_string; ++j)
 	{
-		prot_header_active->push_back((char) char_container[j]);
+		prot_header_active->push_back((char) database_prot_header[j]);
 	}
-	cout << endl;
-	delete char_container ;
-	this->index_prot_header=index;
 }
 
 //Fonction permettant de determiner la longueur de la chaine de character visible
-unsigned int Handle_Database::number_of_character(unsigned int* position_in_header,string first_byte, char* prot_header)
+unsigned int Handle_Database::number_of_character(unsigned int* position_in_header,string first_byte)
 {
 	//Dans le cas ou le premier hex est > 8 on doit lire la taille sur les bytes suivant
 	if( this->hex2int_map[first_byte[0]] >= 8 )
@@ -241,7 +213,7 @@ unsigned int Handle_Database::number_of_character(unsigned int* position_in_head
 		std::stringstream stream;
 		for(unsigned int i=2; i<number_of_byte+2;++i)
 		{
-			character_test = (unsigned int) (u_int8_t)prot_header[i+(*position_in_header)];
+			character_test = (unsigned int) (u_int8_t)database_prot_header[i+(*position_in_header)];
 			stream << std::hex << character_test;
 		}
 		

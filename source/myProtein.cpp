@@ -3,7 +3,6 @@
 
 myProtein::myProtein(const string proteinfile)
 {
-	//header = " " ;
 	header = output_header(proteinfile);
 	sequence = output_sequence(proteinfile);
 	size=sequence.size();
@@ -34,9 +33,6 @@ string myProtein::output_header(const string proteinfile)
 			
 			if(line[0] == '>'){ // Identifier marker
 			  name=line;  
-			  
-			  //std::cout << "name:" <<name << std::endl; 
-					
 			  break;
 			} 
 		}
@@ -46,6 +42,8 @@ string myProtein::output_header(const string proteinfile)
 	
 	else{cout << "Cannot read: " << proteinfile<<endl;}
 	file.close();
+	
+	return ""; //Retou vide = error
 }
 	
  
@@ -71,4 +69,7 @@ string myProtein::output_sequence(const string proteinfile)
   
   else{cout << "Cannot read: " << proteinfile<<endl;}
 	file.close();
+	
+	return "";//Vide error
 }
+
