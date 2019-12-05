@@ -12,9 +12,9 @@ class myProtein {
 	
 	 // Getters
 	 
-	string getSequence() const;
-	string getHeader() const;
-	int getSize() const;
+	string* getSequence();
+	string* getHeader();
+	const int getSize() const;
 	
 	
 	private:

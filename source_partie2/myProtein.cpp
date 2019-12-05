@@ -11,9 +11,9 @@ myProtein::myProtein(const string proteinfile)
 
 	 // Getters
 	 
-	string myProtein::getSequence() const{return sequence;}
-	string myProtein::getHeader() const{return header;}
-	int myProtein::getSize() const{return size;}
+	string* myProtein::getSequence(){return &sequence;}
+	string* myProtein::getHeader(){return &header;}
+	const int myProtein::getSize() const{return size;}
 	 
 
 
