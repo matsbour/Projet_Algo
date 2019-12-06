@@ -11,4 +11,5 @@ int matrice(string Res1, string Res2, const map<char,int>* blos_dictionnary){
 		i++;
 	}
 	cout <<"Nombre de caractères: " << i << " Résultat: " << res << endl;
+	return res;
 }
