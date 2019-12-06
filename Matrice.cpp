@@ -3,19 +3,6 @@ blos_dictionnary= { {'A',0}, {'R',1}, {'N',2}, {'D',3}, {'C',4}, {'Q',5}, {'E',6
 
 int matrice(string Res1, string Res2, const map<char,int>* blos_dictionnary){
   vector<vector<int>>* matri= new vector<vector<int>>();
-	matri->resize(24);
-	for (int i = 0; i<24; i++)
-		matri->at(i).resize(24);
-	for (int i =0; i<24;i++){
-		for (int j = 0; j<24; j++){
-			if (i==j){
-				matri->at(i)[j]=3;
-			}
-			else
-				matri->at(i)[j]=-2;
-		}
-	}
-	
 	i =0;
 	res=0;
 
