@@ -24,7 +24,7 @@ Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein_ini, 
 	this->build_blossum_matrix(filepath);	
 	
 	query_protein = new vector<int> ;
-	for(size_t i=0; i<query_protein_ini->size();++i)
+	for(size_t i=0; i<query_protein_ini->size();++i) //construit le vecteur de la query protein en cherchant la valeur de la lettre dans  
 	{
 		this->query_protein->push_back( prot_dictionnary[(query_protein_ini->at(i))]);
 	}
