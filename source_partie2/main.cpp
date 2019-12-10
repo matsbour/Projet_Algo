@@ -20,9 +20,9 @@ De plus, il peut il y avoir 3 autres paramètres optionnels :
 !!Si un nombre négatif est donné pour l'un des gaps, il sera ignoré et si une chaine '1' est donnée pour Blosum il sera ignoré!!
 */
 
-int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
+int main(int argc, char* argv[])
 {
-	if(argc < 3) //Verification si le nb de parametre est valide
+	if(argc < 3) //Verification si le nombre de paramètres est valide
 	{
 		cout << "Erreur nombre de parametre invalide : " << argc << endl ;
 		exit(1);
