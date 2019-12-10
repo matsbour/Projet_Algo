@@ -2,21 +2,22 @@
 #include "smith_waterman.h"
 #include <cstring>
 
-//Constante 
+//Valeurs constantes par défaut pour l'ouverture d'un gap et l'extension d'un gap
 const int DEFAULT_GAP_OPENER = 11 ;
 const int DEFAULT_GAP_EXTENSION = 1 ;
 
 /*Attention a la fin de la databse verif si aucun prbl*/
 
-/*Main du projet finale, prend obligatoirement 2 parametres :
+/*Main du projet final, prend obligatoirement 2 paramètres :
 	- Chemin vers la database fasta
 	- Chemin vers le fichier fasta de la query
 	
-De plus il peut il y avoir 3 autres parametres optionnels :
-	- Chemin vers une Blossum matrice
+De plus, il peut il y avoir 3 autres paramètres optionnels :
+	- Chemin vers une matrice Blosum
 	- unsigned int gap_opener
 	- unsigned int gap_extension
- !! Si un nombre negatif est donne pour l un des gap il sera ignore et si une chaine '1' est donne pour Blossum il sera ignore!!
+
+!!Si un nombre négatif est donné pour l'un des gaps, il sera ignoré et si une chaine '1' est donnée pour Blosum il sera ignoré!!
 */
 
 int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
@@ -35,7 +36,7 @@ int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
 	
 	switch(argc)
 	{
-	case(3):
+	case(3): //Cas par défaut
 		scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);
 	break;
 	case(4):
