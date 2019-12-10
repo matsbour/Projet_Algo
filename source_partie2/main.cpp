@@ -32,29 +32,33 @@ int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
 	myProtein* prot_query =  new myProtein(argv[2]);
 	Smith_Waterman* scoring_algorithm = NULL;
 	
-	//Choix du cas en fct du nombre et valeur des parametre
+	//On considère les 8 cas où on change ou non les valeurs par défaut de le chemin vers une matrice Blosum, le gap opener et le gap extension 
 	
-	switch(argc)
+	switch(argc) 
 	{
-	case(3): //Cas où on a 3 arguments par défaut
+	case(3): //Cas où on a les 3 valeurs d'arguments par défaut
 		scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);
 	break;
-	case(4):
+	case(4): 
 	{
 		if(atoi(argv[3]) == 1){scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);}
+		
+		//chemin différent de Blosum 62
 		else{scoring_algorithm = new Smith_Waterman(argv[3],prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);}
 	}
 	break;
 	case(5):
 	{
-		if(atoi(argv[3]) == 1)
-		{
+		if(atoi(argv[3]) == 1) 
+		{	
 			if(atoi(argv[4])<0){scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);}
 			else{scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);}
 		}
 		else
 		{
 			if(atoi(argv[4])<0){scoring_algorithm = new Smith_Waterman(argv[3],prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);}
+			
+			//chemin différent de Blosum 62 et différente valeur de gap opener
 			else{scoring_algorithm = new Smith_Waterman(argv[3],prot_query->getSequence(),atoi(argv[4]), DEFAULT_GAP_EXTENSION);}
 		}
 
@@ -67,11 +71,16 @@ int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
 			if(atoi(argv[4])<0)
 			{
 				if(atoi(argv[5])<0){scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);}
+				
+				//différente valeur de gap extension
 				else{scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),DEFAULT_GAP_OPENER, atoi(argv[5]));}
 			}
 			else
 			{
+				//différente valeur de gap opener
 				if(atoi(argv[5])<0){scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),atoi(argv[4]), DEFAULT_GAP_EXTENSION);}
+				
+				//différentes valeurs de gap opener et gap extension
 				else{scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),atoi(argv[4]), atoi(argv[5]));}
 			}
 		}
@@ -80,11 +89,15 @@ int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
 			if(atoi(argv[4])<0)
 			{
 				if(atoi(argv[5])<0){scoring_algorithm = new Smith_Waterman(argv[3],prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);}
+				
+				//différent chemin de blosum 62 et différent gap extension
 				else{scoring_algorithm = new Smith_Waterman(argv[3],prot_query->getSequence(),DEFAULT_GAP_OPENER, atoi(argv[5]));}
 			}
 			else
 			{
 				if(atoi(argv[5])<0){scoring_algorithm = new Smith_Waterman(argv[3],prot_query->getSequence(),atoi(argv[4]), DEFAULT_GAP_EXTENSION);}
+				
+				//les 3 paramètres sont différents de ceux par défaut 
 				else{scoring_algorithm = new Smith_Waterman(argv[3],prot_query->getSequence(),atoi(argv[4]), atoi(argv[5]));}
 			}
 		}
@@ -98,7 +111,7 @@ int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
 	}
 	
 	
-	scoring_algorithm->score_protein(database);
+	scoring_algorithm->score_protein(database); //calcule le score de la protéine
 	
 	delete scoring_algorithm; //Libère la mémoire 
 	delete database;
