@@ -12,7 +12,7 @@ Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein_ini, 
 	 * @param
 	 * @return **/
 	
-	this->prot_dictionnary ={
+	this->prot_dictionnary ={   //dictionnaire du protein sequence file
 		{'-',0}, {'A',1}, {'B',2},{'C',3},{'D',4},
 		{'E',5}, {'F',6}, {'G',7},{'H',8},{'I',9},
 		{'J',27}, {'K',10}, {'L',11},{'M',12}, {'N',13},
@@ -21,10 +21,10 @@ Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein_ini, 
 		{'Y',22}, {'Z',23}, {'*',25}
 	};
 		
-	this->build_blossum_matrix(filepath);	
+	this->build_blossum_matrix(filepath); //construit la matrice BLOSUM
 	
-	query_protein = new vector<int> ;
-	for(size_t i=0; i<query_protein_ini->size();++i) //construit le vecteur de la query protein en cherchant la valeur de la lettre dans  
+	query_protein = new vector<int> ; //construit le vecteur de la query protein en cherchant la valeur correspondant à la lettre dans le dictionnaire
+	for(size_t i=0; i<query_protein_ini->size();++i) 
 	{
 		this->query_protein->push_back( prot_dictionnary[(query_protein_ini->at(i))]);
 	}
@@ -44,7 +44,7 @@ Smith_Waterman::~Smith_Waterman()
 void Smith_Waterman::build_blossum_matrix(const string filepath) // Version Vector[]
 {
 	this->blossum_matrix = new vector<vector<int>>();
-	blossum_matrix->resize(28); //28 si uniquement des matrices blossum et voir prot_dico 28 char
+	blossum_matrix->resize(28); //28 si uniquement des matrices blosum et il y a 28 éléments dans le prot_dictionnary
 	for (int i = 0; i<28; i++)
 		blossum_matrix->at(i).resize(28);
 
