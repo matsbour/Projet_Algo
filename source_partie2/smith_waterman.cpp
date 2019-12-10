@@ -43,23 +43,23 @@ Smith_Waterman::~Smith_Waterman()
 
 void Smith_Waterman::build_blossum_matrix(const string filepath) // Version Vector[]
 {
-	this->blossum_matrix = new vector<vector<int>>();
+	this->blossum_matrix = new vector<vector<int>>(); //construit un vecteur de la matrice blosum
 	blossum_matrix->resize(28); //28 si uniquement des matrices blosum et il y a 28 éléments dans le prot_dictionnary
 	for (int i = 0; i<28; i++)
 		blossum_matrix->at(i).resize(28);
 
 	string container;
-	vector<int> order_of_residu;
+	vector<int> order_of_residu; //
 	ifstream file(filepath, std::ifstream::binary);
 	if(file.is_open())
 	{
-		while(getline(file,container))// permet d eviter les premieres ligne
+		while(getline(file,container))
 		{
-			if(container[0]!= '#')
+			if(container[0]!= '#') //ne prend pas en compte les 6 premières lignes du fichier BLOSUM62
 			{
 				for(size_t i=0; i<container.size();++i)
 				{
-					if(container[i]!=' '){order_of_residu.push_back( this->prot_dictionnary[container[i]]);} //enleve les espaces
+					if(container[i]!=' '){order_of_residu.push_back( this->prot_dictionnary[container[i]]);} //enlève les espaces
 				}
 				break;
 			} 
@@ -172,17 +172,23 @@ void Smith_Waterman::build_blossum_matrix(const string filepath) // Version Vect
 
 unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 {
-	/* Plusieurs etapes :- Etablir la matrice de score et retenir le max
+	/*
+	* @desc Calcule le score de la comparaison de 2 protéines
+	* @param Handle_Database* : la database des protéines connues
+	* @return 
+	*
+	*
+	 *Plusieurs etapes :- Etablir la matrice de score et retenir le max
 	 *					 - Normaliser le score brut obtenu et le sauvegarder
 	 * 					   Sbit = (λ S - ln K)/ ln 2 avec λ = 0.267 et ln(k) = -3.34
 	 * */
 	 
 	 cout << endl << "Debut score_protein : " << endl ;
 	 
-	 //Cree une matrice de score avec colonnes database et ligne protein query
+	 //Crée une matrice de score avec colonnes = protéine de la database et lignes = protein query qu'on veut comparer 
 	 unsigned int size_prot_database;
 	 const size_t size_prot_query = this->query_protein->size();
-	 vector<vector<int>> score_matrix ; // Contiendra toute les valeurs calcule
+	 vector<vector<int>> score_matrix ; // Matrice de score : contiendra toutes les valeurs calculées
 	 vector<int> null_vector ;
 	 vector<int> line_constructed ;
 	 
@@ -279,11 +285,18 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 
 int Smith_Waterman::max_over_zero(int up, int left, int diag) const
 {
-	int return_value = left ;
+	
+	/**
+	* @desc compare 3 valeurs
+	* @param int : un entier en haut, un à gauche et un en diagonale
+	* @return return_value : la valeur la plus grande 
+	**/
+	
+	int return_value = left ; //la valeur la plus grande est celle de gauche par défaut 
 	
 	if(up>return_value){return_value=up;}
 	if(diag>return_value){return_value=diag;}
-	if(return_value<0){return_value=0;}
+	if(return_value<0){return_value=0;} //si la valeur est négative, on la fixe à 0
 	
 	return return_value;
 }
@@ -308,5 +321,6 @@ void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned 
 	}
 }
 
+//Setters 
 void Smith_Waterman::set_gap_opener(const unsigned int new_gap_opener){this->gap_opener=new_gap_opener;}
 void Smith_Waterman::set_gap_extension(const unsigned int new_gap_extension){this->gap_extension = new_gap_extension;}
