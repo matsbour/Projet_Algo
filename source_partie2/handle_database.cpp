@@ -2,11 +2,11 @@
 
 Handle_Database::Handle_Database(const string database_path)
 {
-	this->database_path_saved = database_path; // sauvegarde le chemin d acces
-	this->prot_header_active = new vector<char>;//Cree sur le tas
+	this->database_path_saved = database_path; //sauvegarde le chemin d'accès
+	this->prot_header_active = new vector<char>;//créé sur le tas
 	this->database_prot_sequence = NULL;
 	this->database_prot_header = NULL;
-	this->hex2int_map = { 
+	this->hex2int_map = { //valeurs hexadécimales et décimales correspondantes
 		{'0',0}, {'1',1}, {'2',2}, {'3',3}, {'4',4},
 		{'5',5}, {'6',6}, {'7',7}, {'8',8}, {'9',9},
 		{'A',10}, {'B',11}, {'C',12}, {'D',14}, {'E',15}, {'F',16},
@@ -19,7 +19,7 @@ Handle_Database::Handle_Database(const string database_path)
 	this->database_prot_header = this->read_file(database_path+".phr");
 }
 
-Handle_Database::~Handle_Database()
+Handle_Database::~Handle_Database() 
 {
 	delete this->database_prot_sequence;
 	delete this->database_prot_header;
