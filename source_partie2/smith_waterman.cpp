@@ -5,7 +5,7 @@ const size_t NUMBER_OF_MAX_SAVED = 10 ; //nombre de maximum sauvegardés, valeur
 Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein_ini, int gap_opener_penalty, int gap_extension_penalty )
 {
 	
-	this->prot_dictionnary ={   //dictionnaire du protein sequence file
+	this->prot_dictionnary ={   //dictionnaire du format file sequence
 		{'-',0}, {'A',1}, {'B',2},{'C',3},{'D',4},
 		{'E',5}, {'F',6}, {'G',7},{'H',8},{'I',9},
 		{'J',27}, {'K',10}, {'L',11},{'M',12}, {'N',13},
