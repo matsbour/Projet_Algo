@@ -5,13 +5,6 @@ const size_t NUMBER_OF_MAX_SAVED = 10 ; //nombre de maximum sauvegardés, valeur
 Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein_ini, int gap_opener_penalty, int gap_extension_penalty )
 {
 	
-	/**
-	 * @desc  
-	 * @param 
-	 * @param
-	 * @param
-	 * @return **/
-	
 	this->prot_dictionnary ={   //dictionnaire du protein sequence file
 		{'-',0}, {'A',1}, {'B',2},{'C',3},{'D',4},
 		{'E',5}, {'F',6}, {'G',7},{'H',8},{'I',9},
@@ -29,8 +22,8 @@ Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein_ini, 
 		this->query_protein->push_back( prot_dictionnary[(query_protein_ini->at(i))]);
 	}
 	
-	this->gap_opener = gap_opener_penalty;
-	this->gap_extension = gap_extension_penalty;
+	this->gap_opener = gap_opener_penalty; //pénalité dans le cas où on ouvre un gap
+	this->gap_extension = gap_extension_penalty; //pénalité dans le cas où on propage un gap
 	
 }
 
