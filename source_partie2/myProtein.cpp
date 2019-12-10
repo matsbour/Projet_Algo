@@ -59,7 +59,7 @@ string myProtein::output_sequence(const string proteinfile)
     string content,line;
 	while(getline(file, line)) 
 		{ 
-		if(line[0] != '>'){ // Identifier marker
+		if(line[0] != '>'){ // vérifie que c'est pas la première ligne
 			content=content+line;} 
 	}
 	
