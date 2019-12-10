@@ -1,10 +1,17 @@
 #include "smith_waterman.h"
 
-//Constante :
-const size_t NUMBER_OF_MAX_SAVED = 10 ;
+const size_t NUMBER_OF_MAX_SAVED = 10 ; //nombre de maximum sauvegardés, valeur constante 
 
 Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein_ini, int gap_opener_penalty, int gap_extension_penalty )
 {
+	
+	/**
+	 * @desc  
+	 * @param 
+	 * @param
+	 * @param
+	 * @return **/
+	
 	this->prot_dictionnary ={
 		{'-',0}, {'A',1}, {'B',2},{'C',3},{'D',4},
 		{'E',5}, {'F',6}, {'G',7},{'H',8},{'I',9},
