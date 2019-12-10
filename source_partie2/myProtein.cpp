@@ -19,7 +19,7 @@ const int myProtein::getSize() const{return size;}
 string myProtein::output_header(const string proteinfile) 
 { 
 	/**
-	 * @desc renvoie la description de la protéine 
+	 * @desc extrait la description de la protéine 
 	 * @param string : fichier FASTA de la protéine
 	 * @return name : première ligne du fichier **/
    
@@ -48,9 +48,9 @@ string myProtein::output_header(const string proteinfile)
 string myProtein::output_sequence(const string proteinfile) 
 { 
    /**
-	 * @desc renvoie la séquence de la protéine 
+	 * @desc extrait la séquence de la protéine 
 	 * @param string : fichier FASTA de la protéine
-	 * @return name : les lignes du fichier autres que la première **/
+	 * @return name : séquence de la protéine **/
    
     ifstream file(proteinfile,std::ifstream::binary);
 	if(file.is_open()){
