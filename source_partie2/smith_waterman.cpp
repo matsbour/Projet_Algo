@@ -3,46 +3,46 @@
 //Constante :
 const size_t NUMBER_OF_MAX_SAVED = 10 ;
 
-Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein)
+Smith_Waterman::Smith_Waterman(const string filepath,string* query_protein_ini, int gap_opener_penalty, int gap_extension_penalty )
 {
-	this->build_blossum_matrix(filepath);
-	this->query_protein = query_protein ;
-	this->gap_extension = 1;
-	this->gap_opener = 11;
+	this->prot_dictionnary ={
+		{'-',0}, {'A',1}, {'B',2},{'C',3},{'D',4},
+		{'E',5}, {'F',6}, {'G',7},{'H',8},{'I',9},
+		{'J',27}, {'K',10}, {'L',11},{'M',12}, {'N',13},
+		{'O',26}, {'P',14}, {'Q',15},{'R',16}, {'S',17},
+		{'T',18}, {'U',24}, {'V',19},{'W',20}, {'X',21},
+		{'Y',22}, {'Z',23}, {'*',25}
+	};
+		
+	this->build_blossum_matrix(filepath);	
+	
+	query_protein = new vector<int> ;
+	for(size_t i=0; i<query_protein_ini->size();++i)
+	{
+		this->query_protein->push_back( prot_dictionnary[(query_protein_ini->at(i))]);
+	}
+	
+	this->gap_opener = gap_opener_penalty;
+	this->gap_extension = gap_extension_penalty;
+	
 }
 
 Smith_Waterman::~Smith_Waterman()
 {
 	delete this->blossum_matrix;
+	delete this->query_protein;
 }
 
 
-/*void Smith_Waterman::build_blossum_matrix(const string filepath) // Version Vector[]
+void Smith_Waterman::build_blossum_matrix(const string filepath) // Version Vector[]
 {
-	
-	map<char,int> blos_dictionnary;
-	blos_dictionnary= { {'A',0}, {'R',1}, {'N',2}, {'D',3}, {'C',4}, {'Q',5}, {'E',6}, {'G',7}, {'H',8}, {'I',9}, {'L',10}, {'K',11}, {'M',12}, {'F',13}, {'P',14}, {'S',15}, {'T',16}, {'W',17}, {'Y',18}, {'V',19}, {'B',20}, {'Z',21}, {'X',22},{'*',23}};
-	vector<vector<int>>* matri= new vector<vector<int>>();
-	matri->resize(24);
-	for (int i = 0; i<24; i++)
-		matri->at(i).resize(24);
+	this->blossum_matrix = new vector<vector<int>>();
+	blossum_matrix->resize(28); //28 si uniquement des matrices blossum et voir prot_dico 28 char
+	for (int i = 0; i<28; i++)
+		blossum_matrix->at(i).resize(28);
 
-int matrice(string Res1, string Res2, const map<char,int>* blos_dictionnary, const vector<vector<int>>* matri){
-	i =0;
-	res=0;
-
-	while(Res1[i] != ' ' && Res2[i]!= ' '){
-		res+=matri->at((*blos_dictionnary)[Res1[i]])[(*blos_dictionnary)[Res2[i]]);
-		i++;
-	}
-	cout <<"Nombre de caractères: " << i << " Résultat: " << res << endl;
-	return res;
-}
-	
-	
-	
-	this->blossum_matrix = new map<char,map<char,int>>;
-	string container, order_of_residu;
+	string container;
+	vector<int> order_of_residu;
 	ifstream file(filepath, std::ifstream::binary);
 	if(file.is_open())
 	{
@@ -50,27 +50,28 @@ int matrice(string Res1, string Res2, const map<char,int>* blos_dictionnary, con
 		{
 			if(container[0]!= '#')
 			{
-				order_of_residu = container;
+				for(size_t i=0; i<container.size();++i)
+				{
+					if(container[i]!=' '){order_of_residu.push_back( this->prot_dictionnary[container[i]]);} //enleve les espaces
+				}
 				break;
 			} 
 		}
 		
-		size_t pos_space = 0 ;
-		while(true)//Efface les espaces order_of_residu
-		{
-			pos_space = order_of_residu.find(" ");
-			if(pos_space == string::npos){break;}//Il n y plus d espace dans la chaine
-			order_of_residu.erase(pos_space,1); //Efface un espace
-			
-		}
 		
-		char start_line = ' ';
-		map<char,int> line_map ;
+		int start_line = 0;
+		vector<int> line_vect;
+		for(size_t i=0; i<24; ++i)
+		{
+			line_vect.push_back(0); //on remplit le vect line
+		}
 		size_t compteur_residu = 0; // permet de savoir auxquelles nous sommes
+		
+		int test_test = 0 ; //TEST TEST
 		while(getline(file,container) and !file.eof())//ligne par ligne
 		{
 			compteur_residu=0;
-			start_line = container[0];
+			start_line = prot_dictionnary[container[0]];
 			for(unsigned int i=1; i<container.size();++i)
 			{
 				if(container[i]!=' ')
@@ -78,90 +79,89 @@ int matrice(string Res1, string Res2, const map<char,int>* blos_dictionnary, con
 					if(container[i]=='-') // si nb negatif
 					{
 						//Attention convertion char to int mais valeur pas code ascii : (int)char - (int) '0'	
-						line_map.insert(pair<char,int>(order_of_residu[compteur_residu],-1*((int)container[i+1] - (int)'0')));		
+						line_vect[order_of_residu[compteur_residu]] = ((-1)*((int)container[i+1] - (int)'0'));		
 						++i;
 						++compteur_residu; // Passe au residu suivant 
 					}
 					else//nb a regarder positif
 					{
-						line_map.insert(pair<char,int>(order_of_residu[compteur_residu],(int)container[i] - (int)'0'));
+						if(container[i+1]!=' ') // A cause de 11 pour W deux characters
+						{
+							line_vect[order_of_residu[compteur_residu]] = (((int)container[i]-(int)'0')*10) + ((int)(container[i+1])- (int)'0' );
+							++i;
+						}
+						else{line_vect[order_of_residu[compteur_residu]] = ((int)container[i] - (int)'0');}
 						++compteur_residu; // Passe au residu suivant 
 					}
 				}
 			}
-			this->blossum_matrix->insert(pair<char,map<char,int>>(start_line,line_map));// Ajoute une map a un character dans la matric
+			this->blossum_matrix->at(start_line) =  line_vect;// Ajoute une map a un character dans la matric
+			//line_vect.clear();
+			++test_test ;
+		} 
+	}
+	else{
+	cout<<"Cannot open file : ["<< filepath << "] in order to create the blossum matrix" <<endl;
+	exit(1);}
+	
+	file.close();
+}
+
+/*void Smith_Waterman::build_blossum_matrix(const string filepath) //Version Map[]
+{
+	this->blossum_matrix = new map<int,map<int,int>>;
+	string container;
+	vector<int> order_of_residu;
+	ifstream file(filepath, std::ifstream::binary);
+	if(file.is_open())
+	{
+		while(getline(file,container))// permet d eviter les premieres ligne
+		{
+			if(container[0]!= '#')
+			{
+				for(size_t i=0; i<container.size();++i)
+				{
+					if(container[i]!=' '){order_of_residu.push_back( this->prot_dictionnary[container[i]]);} //enleve les espaces
+				}
+				break;
+			} 
+		}
+		
+		int start_line = 0;
+		map<int,int> line_map ;
+		size_t compteur_residu = 0; // permet de savoir auxquelles nous sommes
+		while(getline(file,container) and !file.eof())//ligne par ligne
+		{
+			compteur_residu=0;
+			start_line = prot_dictionnary[container[0]];
+			for(unsigned int i=1; i<container.size();++i)
+			{
+				if(container[i]!=' ')
+				{
+					if(container[i]=='-') // si nb negatif
+					{
+						//Attention convertion char to int mais valeur pas code ascii : (int)char - (int) '0'	
+						line_map.insert(pair<int,int>(order_of_residu[compteur_residu],-1*((int)container[i+1] - (int)'0')));		
+						++i;
+						++compteur_residu; // Passe au residu suivant 
+					}
+					else//nb a regarder positif
+					{
+						line_map.insert(pair<int,int>(order_of_residu[compteur_residu],(int)container[i] - (int)'0'));
+						++compteur_residu; // Passe au residu suivant 
+					}
+				}
+			}
+			this->blossum_matrix->insert(pair<int,map<int,int>>(start_line,line_map));// Ajoute une map a un character dans la matric
 			line_map.clear();
 		} 
 	}
 	else{
-	cout<<"Cannot open file "<< filepath <<endl;
+	cout<<"Cannot open file : ["<< filepath << "] in order to create the blossum matrix" <<endl;
 	exit(1);}
-	
 	
 	file.close();
 }*/
-
-void Smith_Waterman::build_blossum_matrix(const string filepath) //Version Map[]
-{
-	this->blossum_matrix = new map<char,map<char,int>>;
-	string container, order_of_residu;
-	ifstream file(filepath, std::ifstream::binary);
-	if(file.is_open())
-	{
-		while(getline(file,container))// permet d eviter les premieres ligne
-		{
-			if(container[0]!= '#')
-			{
-				order_of_residu = container;
-				break;
-			} 
-		}
-		
-		size_t pos_space = 0 ;
-		while(true)//Efface les espaces order_of_residu
-		{
-			pos_space = order_of_residu.find(" ");
-			if(pos_space == string::npos){break;}//Il n y plus d espace dans la chaine
-			order_of_residu.erase(pos_space,1); //Efface un espace
-			
-		}
-		
-		char start_line = ' ';
-		map<char,int> line_map ;
-		size_t compteur_residu = 0; // permet de savoir auxquelles nous sommes
-		while(getline(file,container) and !file.eof())//ligne par ligne
-		{
-			compteur_residu=0;
-			start_line = container[0];
-			for(unsigned int i=1; i<container.size();++i)
-			{
-				if(container[i]!=' ')
-				{
-					if(container[i]=='-') // si nb negatif
-					{
-						//Attention convertion char to int mais valeur pas code ascii : (int)char - (int) '0'	
-						line_map.insert(pair<char,int>(order_of_residu[compteur_residu],-1*((int)container[i+1] - (int)'0')));		
-						++i;
-						++compteur_residu; // Passe au residu suivant 
-					}
-					else//nb a regarder positif
-					{
-						line_map.insert(pair<char,int>(order_of_residu[compteur_residu],(int)container[i] - (int)'0'));
-						++compteur_residu; // Passe au residu suivant 
-					}
-				}
-			}
-			this->blossum_matrix->insert(pair<char,map<char,int>>(start_line,line_map));// Ajoute une map a un character dans la matric
-			line_map.clear();
-		} 
-	}
-	else{
-	cout<<"Cannot open file "<< filepath <<endl;
-	exit(1);}
-	
-	
-	file.close();
-}
 
 unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 {
@@ -197,37 +197,46 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 int score_left_gap = 0;
 	 int score_up_gap = 0 ;
 	 
-	 map<char,int> *map_database_prot_tested = NULL; // Permet de retenir la map corrpondant au residu test
-	 char residu_query;
-	 char residu_database ;
-	 unsigned int score_saved;
-	 for(unsigned int index=115000; index<120000; ++index) //Essais sur les 115.000 128.000 soit 17.000
+	 vector<int> *map_database_prot_tested = NULL; // Permet de retenir la map corrpondant au residu test
+	 int* residu_query;
+	 char* residu_database ;
+	 int score_saved;
+	 for(unsigned int index=0; index<7000; ++index) //Essais sur i prot de la database
 	 {
+		 
 		 //Initialisation des variables non constante entre chaque test de protein
 		size_prot_database = database->get_size_sequence_prot(index);
-		database->fetch_prot_sequence(index); // met a jour la prot _active
 		score_matrix.push_back(null_vector); //Premiere ligne de 0
 		max_abs = 0 ;
 		
 		for(unsigned int i=1; i<=size_prot_database; ++i)
 		{
-			residu_database = database->get_prot_active()->at(i-1);
-			map_database_prot_tested = &(this->blossum_matrix->at(residu_database)) ;
+			residu_database = database->fetch_prot_sequence_residu(index,i-1);
+			
+			try{map_database_prot_tested = &(this->blossum_matrix->at((int)(*residu_database))) ;} //Try a cause des residus non pris en compte par blossum
+			catch(const std::out_of_range& e){map_database_prot_tested = &(this->blossum_matrix->at(25));}
 			line_constructed.push_back(0); //premiere colonne de la matrix =  zero
 			index_max_line = 0 ;
 			
 			for(unsigned int j=1; j<=size_prot_query; ++j)
 			{
-				residu_query = this->query_protein->at(j-1);
+				residu_query = &(this->query_protein->at(j-1));
 				
-				score_up_gap = score_matrix[index_max_column[j]][j] - this->gap_opener - (i-index_max_column[j])*this->gap_extension;
-				score_left_gap = line_constructed[index_max_line] - this->gap_opener - (j-index_max_line)*this->gap_extension;
+				score_up_gap = score_matrix[index_max_column[j]][j] - this->gap_opener - (i-index_max_column[j])*(this->gap_extension);
+				score_left_gap = line_constructed[index_max_line] - this->gap_opener - (j-index_max_line)*(this->gap_extension);
 				
-				score_saved = this->max_over_zero(score_left_gap, score_up_gap, 
-							  map_database_prot_tested->at(residu_query)+score_matrix[i-1][j-1]) ;
+				try // Try a cause des residu non pris en compte par la blossum matrix
+				{
+					score_saved = this->max_over_zero(score_left_gap, score_up_gap, 
+								  map_database_prot_tested->at(*residu_query)+score_matrix[i-1][j-1]) ; 
+				}catch(const std::out_of_range& e)
+				{
+					score_saved = this->max_over_zero(score_left_gap, score_up_gap, 
+								  map_database_prot_tested->at(25)+score_matrix[i-1][j-1]) ;
+				}
 				line_constructed.push_back( score_saved);
 				
-				if(max_abs <= score_saved) // mise a jour du maximum
+				if(max_abs < score_saved) // mise a jour du maximum
 				{
 					max_abs = score_saved ;
 					index_max_score_line = i;
@@ -235,8 +244,9 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 				}
 											
 				//Check et changement d index pour calculer les gap correctement
-				if(score_up_gap < (line_constructed[j]-this->gap_opener)){index_max_column[j]=i;}
-				if(score_left_gap < (line_constructed[j]-this->gap_opener)){ index_max_line=j;}
+				if(score_up_gap < (score_saved-this->gap_opener))
+				{index_max_column[j]=i;}
+				if(score_left_gap < (score_saved-this->gap_opener)){ index_max_line=j;}
 			}
 			score_matrix.push_back(line_constructed);
 			line_constructed.clear() ;

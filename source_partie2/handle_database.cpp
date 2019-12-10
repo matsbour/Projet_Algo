@@ -3,18 +3,9 @@
 Handle_Database::Handle_Database(const string database_path)
 {
 	this->database_path_saved = database_path; // sauvegarde le chemin d acces
-	this->prot_active = new vector<char>; //Cree sur le tas
-	this->prot_header_active = new vector<char>;
+	this->prot_header_active = new vector<char>;//Cree sur le tas
 	this->database_prot_sequence = NULL;
 	this->database_prot_header = NULL;
-	this->prot_dictionnary ={
-		{0,'-'}, {1,'A'}, {2,'B'},{3,'C'},{4,'D'},
-		{5,'E'}, {6,'F'}, {7,'G'},{8,'H'},{9,'I'},
-		{27,'J'}, {10,'K'}, {11,'L'},{12,'M'}, {13,'N'},
-		{26,'O'}, {14,'P'}, {15,'Q'},{16,'R'}, {17,'S'},
-		{18,'T'}, {24,'U'}, {19,'V'},{20,'W'}, {21,'X'},
-		{22,'Y'}, {23,'Z'}, {25,'*'}
-	};
 	this->hex2int_map = { 
 		{'0',0}, {'1',1}, {'2',2}, {'3',3}, {'4',4},
 		{'5',5}, {'6',6}, {'7',7}, {'8',8}, {'9',9},
@@ -30,7 +21,6 @@ Handle_Database::Handle_Database(const string database_path)
 
 Handle_Database::~Handle_Database()
 {
-	delete this->prot_active;
 	delete this->database_prot_sequence;
 	delete this->database_prot_header;
 	delete this->prot_header_active;
@@ -60,7 +50,6 @@ char* Handle_Database::read_file(const string filepath)
 	return char_container;
 }
 
-const vector<char>* Handle_Database::get_prot_active(){return this->prot_active;}
 const vector<char>* Handle_Database::get_prot_header_active(){return this->prot_header_active;}
 const unsigned int Handle_Database::get_database_size(){return this->sequence_offset_vector->size();}
 const unsigned int Handle_Database::get_size_sequence_prot(const unsigned int index)
@@ -145,7 +134,7 @@ void Handle_Database::generate_prot_index(string filepath)
 	file.close();
 }
 
-void Handle_Database::fetch_prot_sequence(const unsigned int index)
+char* Handle_Database::fetch_prot_sequence_residu(const unsigned int index, const unsigned int offset)
 { 
 	if(index >= this->sequence_offset_vector->size()) // on verifie si on a un numero de prot trop grand
 	{
@@ -153,16 +142,7 @@ void Handle_Database::fetch_prot_sequence(const unsigned int index)
 		exit(1);
 	}
 	
-	unsigned int length = (int)this->sequence_offset_vector->at(index+1) - (int)this->sequence_offset_vector->at(index);
-	--length; //le dernier byte est un byte null
-	
-	this->prot_active->clear() ;
-	unsigned int position_start =(unsigned int)this->sequence_offset_vector->at(index);
-	for(unsigned int i=0; i<length;++i)
-	{
-		prot_active->push_back(prot_dictionnary[(int)this->database_prot_sequence[i+position_start]]);
-	}
-	
+	return &( this->database_prot_sequence[(int)(this->sequence_offset_vector->at(index))+offset]);
 }
 
 void Handle_Database::fetch_prot_header(const unsigned int index)
