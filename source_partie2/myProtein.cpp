@@ -9,20 +9,19 @@ myProtein::myProtein(const string proteinfile)
 }
 	
 
-	 // Getters
+// Getters
 	 
-	string* myProtein::getSequence(){return &sequence;}
-	string* myProtein::getHeader(){return &header;}
-	const int myProtein::getSize() const{return size;}
+string* myProtein::getSequence(){return &sequence;}
+string* myProtein::getHeader(){return &header;}
+const int myProtein::getSize() const{return size;}
 	 
-
-
-
-// Function definition of output_header() to extract header from file Data Base 
 
 string myProtein::output_header(const string proteinfile) 
 { 
-   // Object to read from file 
+	/**
+	 * @desc renvoie la description de la protéine 
+	 * @param string : fichier FASTA de la protéine
+	 * @return name : première ligne du fichier **/
    
    ifstream file(proteinfile,std::ifstream::binary);
 	if(file.is_open()){
@@ -31,28 +30,27 @@ string myProtein::output_header(const string proteinfile)
 		while(getline(file, line)) 
 			{ 
 			
-			if(line[0] == '>'){ // Identifier marker
+			if(line[0] == '>'){ // marqueur identifiant la première ligne
 			  name=line;  
 			  break;
 			} 
 		}
-		
 	  return name;
 	}
 	
-	else{cout << "Cannot read: " << proteinfile<<endl;}
+	else{cout << "Cannot read: " << proteinfile<<endl;} 
 	file.close();
 	
-	return ""; //Retou vide = error
+	return ""; //Retour vide = error
 }
 	
- 
-
-// Function definition of output_sequence() to extract sequence from file Data Base 
 
 string myProtein::output_sequence(const string proteinfile) 
 { 
-   // Object to read from file 
+   /**
+	 * @desc renvoie la séquence de la protéine 
+	 * @param string : fichier FASTA de la protéine
+	 * @return name : les lignes du fichier autres que la première **/
    
     ifstream file(proteinfile,std::ifstream::binary);
 	if(file.is_open()){
@@ -70,6 +68,6 @@ string myProtein::output_sequence(const string proteinfile)
   else{cout << "Cannot read: " << proteinfile<<endl;}
 	file.close();
 	
-	return "";//Vide error
+	return "";//Vide = error
 }
 
