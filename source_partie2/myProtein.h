@@ -20,16 +20,16 @@ class myProtein {
 	private:
 
 	
-	// Instance variables 
+	// Variables d'instance
 	string header;
 	string sequence;
 	int size;
    
 
-	// Function declaration of output_header() to extract header from file Data Base 
+	// Déclaration de la fonction output_header() qui extrait le header du fichier avec la data base 
 	string output_header(const string proteinfile);
 	
-	// Function declaration of output_sequence() to extract sequence from file Data Base 
+	// Déclaration de la fonction output_sequence() qui extrait la séquence du fichier avec la data base 
 	string output_sequence(const string proteinfile);
 	
 		
