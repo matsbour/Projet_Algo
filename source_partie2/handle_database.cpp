@@ -136,7 +136,7 @@ void Handle_Database::generate_prot_index(string filepath)
 
 char* Handle_Database::fetch_prot_sequence_residu(const unsigned int index, const unsigned int offset)
 { 
-	if(index >= this->sequence_offset_vector->size()) // on verifie si on a un numero de prot trop grand
+	if(index > this->sequence_offset_vector->size()) // on verifie si on a un numero de prot trop grand
 	{
 		cout<<"Index is out of bound for sequence_offset" << endl;
 		exit(1);
