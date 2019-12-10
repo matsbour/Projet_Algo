@@ -99,7 +99,7 @@ int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
 	
 	scoring_algorithm->score_protein(database);
 	
-	delete scoring_algorithm;
+	delete scoring_algorithm; //Libère la mémoire 
 	delete database;
 	delete prot_query;
 	
