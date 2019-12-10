@@ -36,7 +36,7 @@ int main(int argc, char* argv[])//Main du projet finale, prend trois parametres
 	
 	switch(argc)
 	{
-	case(3): //Cas par défaut
+	case(3): //Cas où on a 3 arguments par défaut
 		scoring_algorithm = new Smith_Waterman("BLOSUM62",prot_query->getSequence(),DEFAULT_GAP_OPENER, DEFAULT_GAP_EXTENSION);
 	break;
 	case(4):
