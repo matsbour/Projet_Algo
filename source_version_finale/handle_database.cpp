@@ -148,7 +148,7 @@ char* Handle_Database::fetch_prot_sequence_residu(const unsigned int index, cons
 	* @return 
 	**/
 	
-	if(index > this->sequence_offset_vector->size()) //on vérifie si on a un numero de prot trop grand
+	if(index > this->sequence_offset_vector->size()) //on vérifie si on a un numéro de prot trop grand, dépassement de tampon
 	{
 		cout<<"Index is out of bound for sequence_offset" << endl;
 		exit(1);
@@ -165,7 +165,7 @@ string Handle_Database::fetch_prot_header(const unsigned int index)
 	* @return 
 	**/
 	
-	if(index >= this->header_offset_vector->size()) //on vérifie si on a un numéro de protéine trop grand
+	if(index >= this->header_offset_vector->size()) //on vérifie si on a un numéro de protéine trop grand, dépassement de tampon
 	{
 		cout<<"Index is out of bound for header_offset" << endl;
 		exit(1);
