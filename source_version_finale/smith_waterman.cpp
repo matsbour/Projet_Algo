@@ -38,6 +38,11 @@ Smith_Waterman::~Smith_Waterman()
 
 void Smith_Waterman::build_blossum_matrix(const string filepath) 
 {
+	/*
+	* @desc 
+	* @param 
+	**//
+	
 	int flag = 5000; // Sert a remplir la matrice de base
 	this->blossum_matrix = new vector<vector<int>>();
 	blossum_matrix->resize(28); //28 si uniquement des matrices blosum et il y a 28 éléments dans le prot_dictionnary
@@ -49,7 +54,7 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 	ifstream file(filepath, std::ifstream::binary);
 	if(file.is_open())
 	{
-		while(getline(file,container))// permet d eviter les premieres ligne
+		while(getline(file,container))
 		{
 			if(container[0]!= '#') //ne prend pas en compte les 6 premières lignes du fichier BLOSUM62
 			{
