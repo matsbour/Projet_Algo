@@ -30,14 +30,21 @@ Handle_Database::~Handle_Database()
 
 char* Handle_Database::read_file(const string filepath)
 {
+	
+	/**
+	* @desc lit un fichier et stocke les caractères du fichier 
+	* @param string : chemin d'accès du fichier
+	* @return char_container : ??
+	**/
+	
 	ifstream file(filepath, ios::in | ios::binary);
 	char* char_container = NULL;
 	if(file.is_open())
 	{
 		file.seekg(0,file.end);
-		int length = file.tellg(); //Nombre de characters dans le fichier a lire
+		int length = file.tellg(); //Nombre de charactères dans le fichier à lire
 		file.seekg(0,file.beg);
-		char_container = new char [length] ; //servira a stocke tous les char du fichier
+		char_container = new char [length] ; //servira a stocker tous les char du fichier
 		file.read(char_container,length);
 		file.close();
 	}
@@ -57,6 +64,7 @@ const unsigned int Handle_Database::get_size_sequence_prot(const unsigned int in
 	}
 	else
 	{
+		//si on a un dépassement de tampon
 		cout << "Out of bound : " << index << " size limit : " << (this->sequence_offset_vector->size()-1) << endl ;
 		exit(1);
 	}
@@ -202,7 +210,7 @@ unsigned int Handle_Database::number_of_character(unsigned int* position_in_head
 }
 
 
-
+//Définition des getters
 u_int32_t Handle_Database::get_version(){return version;}
 u_int32_t Handle_Database::get_database_type(){return database_type;}
 u_int32_t  Handle_Database::get_title_length(){return title_length;}
