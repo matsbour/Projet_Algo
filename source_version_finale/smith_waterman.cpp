@@ -284,7 +284,7 @@ void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned 
 			index_max_table[pos_found+1] = index_max_table[pos_found] ;
 			max_table[pos_found] = value ;
 			index_max_table[pos_found] = index ;
-			--pos_found ; //Si pas trouvé on monte dans le tableau
+			--pos_found ; //Si pas trouvé, on monte dans le tableau
 			
 		}
 	}
@@ -298,24 +298,34 @@ void Smith_Waterman::set_gap_extension(const unsigned int new_gap_extension){thi
 
 const void Smith_Waterman::display_information(Handle_Database* database)
 {
-		cout << "Database title: " ;
+	/**
+	* @desc affiche des informations sur la database et le protéine query qu'on veut comparer
+	* @param Handle_Database* : pointeur vers la database
+	**/
+	
+		cout << "Database title: " ; 
 		for(unsigned int i=0;i<strlen(database->get_title());++i){cout<<database->get_title()[i];}
 		cout << endl ;
 		
+		//affiche le nombre de résidus pour les nombre de protéines de la database
 		cout << "Database size: " << (int)(database->get_numbers_of_residues()) << " residues in "
-			 << database->get_database_size()-1 << " sequences" << endl ;
+			 << database->get_database_size()-1 << " sequences" << endl ; 
 		
+		//affiche le nombre de résidus de la plus longue protéine de la database
 		cout<<"Longest db seq: " << (int)(database->get_prot_max_length()) << " residues"<<endl ;
 		
+		//affiche l'heure de création de la database
 		cout << "Database creation  : " ;
 		for(unsigned int i=0;i<strlen(database->get_timestamp());++i){cout<<database->get_timestamp()[i];}
 		cout << endl ;
 		
+		//affiche le nom de la protéine query
 		cout <<"Query name :  ";
 		for(size_t i=0;i<this->query_protein_header->size();++i)
 		{ printf("%c",this->query_protein_header->at(i));}
 		cout << endl;
 		
+		//affiche la taille de la protéine query
 		cout << "Query length : " << this->query_protein->size() << " residues" << endl << endl;
 		
 	
