@@ -2,7 +2,7 @@
 
 Handle_Database::Handle_Database(const string database_path)
 {
-	this->database_path_saved = database_path; // sauvegarde le chemin d acces
+	this->database_path_saved = database_path; //sauvegarde le chemin d'accès
 	this->database_prot_sequence = NULL;
 	this->database_prot_header = NULL;
 	this->hex2int_map = { //valeurs hexadécimales et décimales correspondantes
@@ -13,9 +13,9 @@ Handle_Database::Handle_Database(const string database_path)
 	};
 	this->header_offset_vector = new vector<int>;
 	this->sequence_offset_vector = new vector<int>;
-	this->generate_prot_index(database_path+".pin");
-	this->database_prot_sequence = this->read_file(database_path+".psq");
-	this->database_prot_header = this->read_file(database_path+".phr");
+	this->generate_prot_index(database_path+".pin"); //index file
+	this->database_prot_sequence = this->read_file(database_path+".psq"); //proteine sequence file
+	this->database_prot_header = this->read_file(database_path+".phr"); //header file
 }
 
 Handle_Database::~Handle_Database()
