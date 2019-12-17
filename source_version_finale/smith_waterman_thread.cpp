@@ -2,10 +2,10 @@
 
 //Constante :
 const size_t NUMBER_OF_MAX_SAVED = 10 ; //nombre de maximum sauvegardés, valeur constante 
-const size_t NUMBER_OF_THREAD = 2 ; //Nombre de thread effectif
-std::mutex mutex_score; //Permet d assurer le controle sur les ressources partage
-unsigned int max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra dans l ordre decroissant les meilleurs scores normalise
-unsigned int index_max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra l index des proteines avec un bon score normalise
+const size_t NUMBER_OF_THREAD = 2 ; //Nombre de threads effectifs
+std::mutex mutex_score; //Permet d'assurer le contrôle sur les ressources partagées
+unsigned int max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra dans l'ordre décroissant les meilleurs scores normalisés
+unsigned int index_max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra l'index des protéines avec un bon score normalisé
 
 Smith_Waterman::Smith_Waterman(const string filepath,myProtein* query_protein_ini, int gap_opener_penalty, int gap_extension_penalty, Handle_Database* database )
 {
@@ -280,19 +280,24 @@ int Smith_Waterman::max_over_zero(int up, int left, int diag) const
 
 void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned int value, unsigned int max_table[], unsigned int index_max_table[]) 
 {
-	if(value > max_table[NUMBER_OF_MAX_SAVED-1])//Si la valeur a test est superieur à la plus petite du tableau
+	/**
+	* @desc place une valeur dans la tableau contenant les maximum 
+	* @param int : une valeur à comparer et son index, une valeur du tableau des maximum et son index 
+	**/
+	
+	if(value > max_table[NUMBER_OF_MAX_SAVED-1])//Vérifie si la valeur à tester est supérieure à la plus petite valeur du tableau
 	{
-		//Possibilite de recherche dichotomique plus mais pas forcement interessante si vraiment petit tableau
+		//Possibilité de recherche dichotomique plus mais pas forcément intéressante si vraiment petit tableau
 		max_table[NUMBER_OF_MAX_SAVED-1] = value ;
 		index_max_table[NUMBER_OF_MAX_SAVED-1] = index ;
 		int pos_found = NUMBER_OF_MAX_SAVED-2 ;
-		while( (value > max_table[pos_found]) and (pos_found>=0) )
+		while( (value > max_table[pos_found]) and (pos_found>=0) ) //parcourt le tableau tant que la valeur à tester est plus grande
 		{
 			max_table[pos_found+1] = max_table[pos_found] ;
 			index_max_table[pos_found+1] = index_max_table[pos_found] ;
-			max_table[pos_found] = value ;
+			max_table[pos_found] = value ; //Si une valeur du tableau est plus petite que value, value la remplace
 			index_max_table[pos_found] = index ;
-			--pos_found ; //Si pas trouve on monte dans le tableau
+			--pos_found ; //Si une valeur du tableau plus grande que value n'a pas été trouvée, on monte dans le tableau
 			
 		}
 	}
