@@ -131,12 +131,11 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	/*
 	* @desc Calcule le score de la comparaison de 2 protéines
 	* @param Handle_Database* : la database des protéines connues
-	* @return 
 	*
 	*
 	 *Plusieurs etapes :- Etablir la matrice de score et retenir le max
-	 *					 - Normaliser le score brut obtenu et le sauvegarder
-	 * 					   Sbit = (λ S - ln K)/ ln 2 avec λ = 0.267 et ln(k) = -3.34
+	 *		    - Normaliser le score brut obtenu et le sauvegarder
+	 *                    Sbit = (λ S - ln K)/ ln 2 avec λ = 0.267 et ln(k) = -3.34
 	 * */
 	 
 	 this->display_information(database) ;
@@ -267,9 +266,15 @@ int Smith_Waterman::max_over_zero(int up, int left, int diag) const
 
 void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned int value, unsigned int max_table[], unsigned int index_max_table[]) 
 {
-	if(value > max_table[NUMBER_OF_MAX_SAVED-1])//Si la valeur a test est superieur à la plus petite du tableau
+	
+	/**
+	* @desc 
+	* @param 
+	**/
+	
+	if(value > max_table[NUMBER_OF_MAX_SAVED-1])//Si la valeur à tester est supérieure à la plus petite du tableau
 	{
-		//Possibilite de recherche dichotomique plus mais pas forcement interessante si vraiment petit tableau
+		//Possibilité de recherche dichotomique plus mais pas forcément intéressante si vraiment petit tableau
 		max_table[NUMBER_OF_MAX_SAVED-1] = value ;
 		index_max_table[NUMBER_OF_MAX_SAVED-1] = index ;
 		int pos_found = NUMBER_OF_MAX_SAVED-2 ;
@@ -279,7 +284,7 @@ void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned 
 			index_max_table[pos_found+1] = index_max_table[pos_found] ;
 			max_table[pos_found] = value ;
 			index_max_table[pos_found] = index ;
-			--pos_found ; //Si pas trouve on monte dans le tableau
+			--pos_found ; //Si pas trouvé on monte dans le tableau
 			
 		}
 	}
@@ -288,6 +293,8 @@ void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned 
 //Setters 
 void Smith_Waterman::set_gap_opener(const unsigned int new_gap_opener){this->gap_opener=new_gap_opener;}
 void Smith_Waterman::set_gap_extension(const unsigned int new_gap_extension){this->gap_extension = new_gap_extension;}
+
+
 
 const void Smith_Waterman::display_information(Handle_Database* database)
 {
@@ -316,16 +323,22 @@ const void Smith_Waterman::display_information(Handle_Database* database)
 
 const void Smith_Waterman::display_max(unsigned int* max_saved, unsigned int* index_max_saved, Handle_Database* database)
 {
+	
+	/**
+	* @desc affiche les protéines ayant les meilleurs scores
+	* @param int : pointeur vers les scores maximums sauvegardés ainsi que leur index, Handle_database* : pointeur vers la database
+	**/
+	
 	cout << "Sequences producing significant alignments:" << endl;
 	
 	string name_display = " ";
-	size_t limit_size = 60 ;
+	size_t limit_size = 60 ; 
 	for(size_t i=0; i<NUMBER_OF_MAX_SAVED; ++i)
 	{
 		name_display = database->fetch_prot_header(index_max_saved[i]) ;
-		if(name_display.size() > limit_size){name_display = name_display.substr(0,limit_size) +"..." ;}
-		cout<< "Score :" <<  max_saved[i]  ;
-		cout << " index " << index_max_saved[i] << ":" << name_display << endl;
+		if(name_display.size() > limit_size){name_display = name_display.substr(0,limit_size) +"..." ;} //affiche que les 60 premiers caractères du nom de la protéine i
+		cout<< "Score :" <<  max_saved[i]  ; //affiche le score de la protéine i 
+		cout << " index " << index_max_saved[i] << ":" << name_display << endl; //affiche l'index de la protéine i 
 	}
 }
 
