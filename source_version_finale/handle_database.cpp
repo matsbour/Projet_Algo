@@ -55,11 +55,20 @@ char* Handle_Database::read_file(const string filepath)
 	return char_container;
 }
 
+//Renvoie la taille de ???
 const unsigned int Handle_Database::get_database_size(){return (this->sequence_offset_vector->size()-1);}
+
 const unsigned int Handle_Database::get_size_sequence_prot(const unsigned int index)
-{
+{	
+	/**
+	* @desc détermine la taille d'une séquence de protéines
+	* @param int : un index
+	* @return taille de la séquence
+	**/
+	
 	if(index <(this->sequence_offset_vector->size())-1)
 	{
+		//taille de la séquence est la soustraction de l'offset de la prochaine séquence et de l'offset de la séquence actuelle	
 		return (unsigned int)(this->sequence_offset_vector->at(index+1) - this->sequence_offset_vector->at(index))-1 ;
 	}
 	else
@@ -71,38 +80,43 @@ const unsigned int Handle_Database::get_size_sequence_prot(const unsigned int in
 	return 0;
 	}
 
-//Remplis tous les attributs necessaie depuis le fichier .pin
+
 void Handle_Database::generate_prot_index(string filepath)
 {
+	/**
+	* @desc remplit tous les attributs nécessaires depuis le fichier .pin
+	* @param string : chemin d'accès du fichier 
+	**/
+	
 	ifstream file(filepath,std::ifstream::binary);
 	if(file.is_open())
 	{
-		file.read((char*)&version,sizeof(uint32_t));
+		file.read((char*)&version,sizeof(uint32_t)); //nombre de la version
 		version = __builtin_bswap32(version);
 	
-		file.read((char*)&database_type,sizeof(uint32_t));
+		file.read((char*)&database_type,sizeof(uint32_t)); //type de la database (ici protéines)
 		database_type = __builtin_bswap32(database_type);
 	
-		file.read((char*)&title_length,sizeof(uint32_t));
+		file.read((char*)&title_length,sizeof(uint32_t)); //longueur de la string du titre
 		title_length = __builtin_bswap32(title_length);
 		
-		title = new char[(int)title_length+1];
+		title = new char[(int)title_length+1];  //string du titre
 		file.read(title,(int)title_length);
 		title[(int)title_length] = '\0';
 		
-		file.read((char*)&timestamp_length,sizeof(uint32_t));
+		file.read((char*)&timestamp_length,sizeof(uint32_t)); //longueur de la string du timestamp
 		timestamp_length = __builtin_bswap32(timestamp_length);
 		
-		timestamp = new char[(int)timestamp_length+1];
+		timestamp = new char[(int)timestamp_length+1]; //temps de la création de la database
 		file.read(timestamp,(int)timestamp_length);
 		timestamp[(int)timestamp_length] = '\0';
 		
-		file.read((char*)&numbers_of_sequence,sizeof(uint32_t));
+		file.read((char*)&numbers_of_sequence,sizeof(uint32_t)); //nombre de séquences dans la database
 		numbers_of_sequence = __builtin_bswap32(numbers_of_sequence);
 		
-		file.read((char*)&numbers_of_residues,sizeof(uint64_t));
+		file.read((char*)&numbers_of_residues,sizeof(uint64_t)); //nombre de résidus dans la database
 		
-		file.read((char*)&prot_max_length,sizeof(uint32_t));
+		file.read((char*)&prot_max_length,sizeof(uint32_t)); //longueur de la plus longue séquence dans la database
 		prot_max_length = __builtin_bswap32(prot_max_length);
 		 
 		u_int32_t* header_offset = new u_int32_t[(int)numbers_of_sequence+1] ; // Tableau d offset representant l ecart entre chaque header
@@ -119,7 +133,7 @@ void Handle_Database::generate_prot_index(string filepath)
 			sequence_offset_vector->push_back((int)__builtin_bswap32(sequence_offset[i]));
 		}
 		
-		delete header_offset;
+		delete header_offset; //libère la mémoire
 		delete sequence_offset;
 	}
 	else{cout << "Cannot read: " << filepath<<endl;}
@@ -128,7 +142,13 @@ void Handle_Database::generate_prot_index(string filepath)
 
 char* Handle_Database::fetch_prot_sequence_residu(const unsigned int index, const unsigned int offset)
 { 
-	if(index > this->sequence_offset_vector->size()) // on verifie si on a un numero de prot trop grand
+	/**
+	* @desc 
+	* @param 
+	* @return 
+	**/
+	
+	if(index > this->sequence_offset_vector->size()) //on vérifie si on a un numero de prot trop grand
 	{
 		cout<<"Index is out of bound for sequence_offset" << endl;
 		exit(1);
@@ -139,28 +159,39 @@ char* Handle_Database::fetch_prot_sequence_residu(const unsigned int index, cons
 
 string Handle_Database::fetch_prot_header(const unsigned int index)
 {
-	if(index >= this->header_offset_vector->size()) // on verifie si on a un numero de prot trop grand
+	/**
+	* @desc 
+	* @param int : un index 
+	* @return 
+	**/
+	
+	if(index >= this->header_offset_vector->size()) //on vérifie si on a un numéro de protéine trop grand
 	{
 		cout<<"Index is out of bound for header_offset" << endl;
 		exit(1);
 	}
 	
 	string value_return = " ";
+	
+	//taille du header est la soustraction de l'offset de la prochaine séquence et de l'offset de la séquence actuelle
 	unsigned int length = (int)this->header_offset_vector->at(index+1) - (int)this->header_offset_vector->at(index);
+	
+	//on initialise les valeurs
 	unsigned int size_of_visible_string = 0 ;
 	unsigned int int_test = 0;
 	unsigned int position_start_string = 0 ;
+	
 	unsigned int position_start = (unsigned int)this->header_offset_vector->at(index) ;
 	std::stringstream stream;
 	for(unsigned int i=position_start; i< length+position_start;++i )
 	{
 		int_test = (unsigned int) (u_int8_t)database_prot_header[i];
-		if(int_test == 26) // Car 1A = 26, on ignore les premier byte designant les types
+		if(int_test == 26) //Car 1A = 26, on ignore les premiers bytes désignants les types, le byte suivant commence à encoder la longeur de la string
 		{
 			int_test = (unsigned int) (u_int8_t)database_prot_header[i+1];
 			stream << std::hex << int_test;
 			size_of_visible_string = this->number_of_character(&i,stream.str()) ;
-			position_start_string = i+2;// si on dit que le premier hex ne peut pas depasser 8 
+			position_start_string = i+2;//si on dit que le premier hex ne peut pas depasser 8 
 			stream.str(string()); //vide le stream
 			break;
 		}
@@ -174,10 +205,16 @@ string Handle_Database::fetch_prot_header(const unsigned int index)
 	return value_return;
 }
 
-//Fonction permettant de determiner la longueur de la chaine de character visible
 unsigned int Handle_Database::number_of_character(unsigned int* position_in_header,string first_byte)
 {
-	//Dans le cas ou le premier hex est > 8 on doit lire la taille sur les bytes suivant
+	
+	/**
+	* @desc détermine la longueur de la chaine de characters visibles
+	* @param int* : pointeur vers une position, string : premier byte
+	* @return size_saved_int : longueur de la chaine de characters visibles
+	**/
+	
+	//Dans le cas où le premier hex est > 8 on doit lire la taille sur les bytes suivants
 	if( this->hex2int_map[first_byte[0]] >= 8 )
 	{	
 		unsigned int number_of_byte = this->hex2int_map[first_byte[1]] ;
@@ -201,7 +238,8 @@ unsigned int Handle_Database::number_of_character(unsigned int* position_in_head
 		
 		return size_saved_int;
 	}
-	//Cas ou les hex donne directement la taille de la string
+	
+	//Cas où les hex donnent directement la taille de la string
 	else
 	{
 		return this->hex2int_map[first_byte[0]]*16 + this->hex2int_map[first_byte[1]] ;
