@@ -8,7 +8,7 @@
 #include <vector>
 #include <iomanip>
 #include <math.h>
-#include <endian.h> // for bswap
+#include <endian.h> //pour bswap
 using namespace std;
 
 class Handle_Database
@@ -16,6 +16,7 @@ class Handle_Database
 private :
 	//Attribut
 	string database_path_saved ;
+	
 	//Attribut sequence
 	char* database_prot_sequence ; //Contiendra toute la database psq
 	
@@ -44,11 +45,11 @@ private :
 public :
 	Handle_Database(const string database_path) ;
 	~Handle_Database();
-	void update_next_protein_header(); //Permet de mettre a jour prot_active_header
-	char* fetch_prot_sequence_residu(const unsigned int index, const unsigned int offset);//Renvoie le residu demande par index/offset
+	void update_next_protein_header(); //Permet de mettre à jour prot_active_header
+	char* fetch_prot_sequence_residu(const unsigned int index, const unsigned int offset);//Renvoie le residu demandé par index/offset
 	string fetch_prot_header(const unsigned int index);
 	
-	//Get et set
+	//Getters
 	u_int32_t get_version();
 	u_int32_t get_database_type();
 	u_int32_t  get_title_length();
