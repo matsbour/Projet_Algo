@@ -1,4 +1,4 @@
-Le format du fichier binaire contenant les sequences des proteins suit cette table:
+Le format du fichier binaire contenant les séquences des protéines suit cette table:
 
 Amino acid  Value       Amino acid  Value       Amino acid  Value       Amino acid  Value
     -         0                G     7               N        13             U        24
@@ -9,4 +9,4 @@ Amino acid  Value       Amino acid  Value       Amino acid  Value       Amino ac
     E         5                L    12               S        17             Z        23
     F         6                M    13               T        18             *        25
 
-Chaque sequence est mise les une a la suite des autres separé par un Byte NULL, chaque valeur est code en 8 bits.
+Chaque sequence est mise les unes à la suite des autres separées par un Byte NULL, chaque valeur est codée en 8 bits.
