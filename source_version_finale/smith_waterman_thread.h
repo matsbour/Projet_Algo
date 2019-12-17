@@ -1,4 +1,4 @@
-#include "handle_database.h" // include permet aussi d amener toute les fonctionnalite tel vector,map...
+#include "handle_database.h" // include permet aussi d'amener toutes les fonctionnalités telles que vector,map...
 #include "myProtein.h"
 #include <thread>
 #include <mutex>
@@ -7,16 +7,16 @@ using namespace std;
 class Smith_Waterman
 {
 private:
-	 //Permet de retrouver les valeurs necessaire a la construction de la matrice score 
-	vector<vector<int>>* blossum_matrix;  // Depend du prot_dictionnary pour la trad char to int
+	 //Permet de retrouver les valeurs necessaires à la construction de la matrice score 
+	vector<vector<int>>* blossum_matrix;  // Dépend du prot_dictionnary pour la traduction de char to int
 	vector<int>* query_protein; // Contient la protéine à chercher dans la database qui sera traduite char->int avec le prot_dico de handle_database
 	string* query_protein_header ;
 	int gap_opener ; // 11 par défaut, modifié si besoin par un set
-	int gap_extension ; //1 par défaut modifié si besoin par un set
+	int gap_extension ; //1 par défaut, modifié si besoin par un set
 	Handle_Database* database ; // Contient le pointeur vers la database
-	map<char,int> prot_dictionnary ; //Dictionnaire pour lire le int associer a chaque char
+	map<char,int> prot_dictionnary ; //Dictionnaire pour lire le int associé à chaque char
 	
-	//Fct privee
+	//Fonction privée
 	void build_blossum_matrix(const string filepath);//Fct appelée dans le constructeur et remplit la matrix blosum
 	void locate_replace_max(const unsigned int index,const unsigned int value, unsigned int max_table[], unsigned int index_max_table[]) ;
 	const void display_information(Handle_Database* database);
