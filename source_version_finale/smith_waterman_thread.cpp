@@ -304,24 +304,35 @@ void Smith_Waterman::set_gap_extension(const unsigned int new_gap_extension){thi
 
 const void Smith_Waterman::display_information(Handle_Database* database)
 {
+	
+	/**
+	* @desc affiche des informations sur la database et le protéine query qu'on veut comparer
+	* @param Handle_Database* : pointeur vers la database
+	**/
+	
 		cout << "Database title: " ;
 		for(unsigned int i=0;i<strlen(database->get_title());++i){cout<<database->get_title()[i];}
 		cout << endl ;
 		
+		//affiche le nombre de résidus pour les nombre de protéines de la database
 		cout << "Database size: " << (int)(database->get_numbers_of_residues()) << " residues in "
 			 << database->get_database_size()-1 << " sequences" << endl ;
 		
+		//affiche le nombre de résidus de la plus longue protéine de la database
 		cout<<"Longest db seq: " << (int)(database->get_prot_max_length()) << " residues"<<endl ;
 		
+		//affiche l'heure de création de la database
 		cout << "Database creation  : " ;
 		for(unsigned int i=0;i<strlen(database->get_timestamp());++i){cout<<database->get_timestamp()[i];}
 		cout << endl ;
 		
+		//affiche le nom de la protéine query
 		cout <<"Query name :  ";
 		for(size_t i=0;i<this->query_protein_header->size();++i)
 		{ printf("%c",this->query_protein_header->at(i));}
 		cout << endl;
 		
+		//affiche la taille de la protéine query
 		cout << "Query length : " << this->query_protein->size() << " residues" << endl << endl;
 		
 	
@@ -329,6 +340,11 @@ const void Smith_Waterman::display_information(Handle_Database* database)
 
 const void Smith_Waterman::display_max(unsigned int* max_saved, unsigned int* index_max_saved, Handle_Database* database)
 {
+	/**
+	* @desc affiche les protéines ayant les meilleurs scores
+	* @param int : pointeur vers les scores maximums sauvegardés ainsi que leur index, Handle_database* : pointeur vers la database
+	**/
+	
 	cout << "Sequences producing significant alignments:" << endl;
 	
 	string name_display = " ";
@@ -336,9 +352,9 @@ const void Smith_Waterman::display_max(unsigned int* max_saved, unsigned int* in
 	for(size_t i=0; i<NUMBER_OF_MAX_SAVED; ++i)
 	{
 		name_display = database->fetch_prot_header(index_max_saved[i]) ;
-		if(name_display.size() > limit_size){name_display = name_display.substr(0,limit_size) +"..." ;}
-		cout<< "Score :" <<  max_saved[i]  ;
-		cout << " index " << index_max_saved[i] << ":" << name_display << endl;
+		if(name_display.size() > limit_size){name_display = name_display.substr(0,limit_size) +"..." ;} //affiche que les 60 premiers caractères du nom de la protéine i
+		cout<< "Score :" <<  max_saved[i]  ; //affiche le score de la protéine i 
+		cout << " index " << index_max_saved[i] << ":" << name_display << endl; //affiche l'index de la protéine i
 	}
 }
 
