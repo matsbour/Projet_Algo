@@ -130,7 +130,7 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 {
 	/*
 	* @desc Calcule le score de la comparaison de 2 protéines
-	* @param Handle_Database* : la database des protéines connues
+	* @param Handle_Database* : pointeur vers la database des protéines
 	*
 	*
 	 *Plusieurs etapes :- Etablir la matrice de score et retenir le max
@@ -268,23 +268,23 @@ void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned 
 {
 	
 	/**
-	* @desc 
-	* @param 
+	* @desc  
+	* @param int : une valeur à comparer et son index, une valeur max d'un tableau et son index 
 	**/
 	
-	if(value > max_table[NUMBER_OF_MAX_SAVED-1])//Si la valeur à tester est supérieure à la plus petite du tableau
+	if(value > max_table[NUMBER_OF_MAX_SAVED-1])//Vérifie si la valeur à tester est supérieure à la plus petite valeur du tableau
 	{
 		//Possibilité de recherche dichotomique plus mais pas forcément intéressante si vraiment petit tableau
 		max_table[NUMBER_OF_MAX_SAVED-1] = value ;
 		index_max_table[NUMBER_OF_MAX_SAVED-1] = index ;
 		int pos_found = NUMBER_OF_MAX_SAVED-2 ;
-		while( (value > max_table[pos_found]) and (pos_found>=0) )
+		while((value > max_table[pos_found]) and (pos_found>=0)) //parcourt le tableau tant que la valeur à tester est plus grande
 		{
 			max_table[pos_found+1] = max_table[pos_found] ;
 			index_max_table[pos_found+1] = index_max_table[pos_found] ;
-			max_table[pos_found] = value ;
+			max_table[pos_found] = value ; //Si une valeur du tableau est plus petite que value, value la remplace
 			index_max_table[pos_found] = index ;
-			--pos_found ; //Si pas trouvé, on monte dans le tableau
+			--pos_found ; //Si une valeur du tableau plus grande que value n'a pas été trouvée, on monte dans le tableau
 			
 		}
 	}
