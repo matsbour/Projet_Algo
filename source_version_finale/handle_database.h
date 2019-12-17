@@ -49,7 +49,7 @@ public :
 	char* fetch_prot_sequence_residu(const unsigned int index, const unsigned int offset);//Renvoie le residu demandé par index/offset
 	string fetch_prot_header(const unsigned int index);
 	
-	//Getters
+	//Déclaration des getters
 	u_int32_t get_version();
 	u_int32_t get_database_type();
 	u_int32_t  get_title_length();
