@@ -1,10 +1,15 @@
-#include "smith_waterman.h"
+#include "smith_waterman_thread.h"
 
 //Constante :
 const size_t NUMBER_OF_MAX_SAVED = 10 ; //nombre de maximum sauvegardés, valeur constante 
+const size_t NUMBER_OF_THREAD = 2 ; //Nombre de thread effectif
+std::mutex mutex_score; //Permet d assurer le controle sur les ressources partage
+unsigned int max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra dans l ordre decroissant les meilleurs scores normalise
+unsigned int index_max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra l index des proteines avec un bon score normalise
 
-Smith_Waterman::Smith_Waterman(const string filepath,myProtein* query_protein_ini, int gap_opener_penalty, int gap_extension_penalty )
+Smith_Waterman::Smith_Waterman(const string filepath,myProtein* query_protein_ini, int gap_opener_penalty, int gap_extension_penalty, Handle_Database* database )
 {
+	this->database = database ;
 	this->prot_dictionnary ={ //dictionnaire du format file sequence
 		{'-',0}, {'A',1}, {'B',2},{'C',3},{'D',4},
 		{'E',5}, {'F',6}, {'G',7},{'H',8},{'I',9},
@@ -126,7 +131,24 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 	file.close();
 }
 
-unsigned int Smith_Waterman::score_protein(Handle_Database* database)
+unsigned int Smith_Waterman::setup_score_protein()
+{
+	this->display_information(database) ;
+	fill(index_max_saved, index_max_saved+NUMBER_OF_MAX_SAVED,0);
+	fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplis de 0
+	std::thread t0(&Smith_Waterman::score_protein, this,0);
+	std::thread t1(&Smith_Waterman::score_protein, this,1);
+	t0.join();
+	t1.join();
+	this->display_max(max_saved, index_max_saved , database);
+	
+}
+
+/*
+*	Fonction principale du code 
+* 
+*/
+void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 {
 	/*
 	* @desc Calcule le score de la comparaison de 2 protéines
@@ -139,12 +161,6 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 * 					   Sbit = (λ S - ln K)/ ln 2 avec λ = 0.267 et ln(k) = -3.34
 	 * */
 	 
-	 this->display_information(database) ;
-	 if(database->get_database_size() == 0)
-	 {
-		 cout << "Database vide" << endl ;
-		 exit(1);
-	 }
 	 
 	 //Crée une matrice de score avec colonnes = protéine de la database et lignes = protein query qu'on veut comparer 
 	 unsigned int size_prot_database;
@@ -154,10 +170,7 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 vector<int>* vect_saved; //Pointeur vers le vect qui stocke les valeurs de la ligne du dessus a celle calcule
 	 vector<int> null_vector ;
 	 vector<int> line_constructed ;
-	 unsigned int max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra dans l ordre decroissant les meilleurs scores normalise
-	 unsigned int index_max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra l index des proteines avec un bon score normalise
-	 fill(index_max_saved, index_max_saved+NUMBER_OF_MAX_SAVED,0);
-	 fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplis de 0
+	 
 	 unsigned int index_max_column[size_prot_query+1];//Contiendra l index de la val a utilise pour les gap top
 	 unsigned int max_score_column[size_prot_query+1];
 	 unsigned int index_max_line =0 ; // Contiendra la val max de la ligne a utiliser pour les gap left
@@ -173,6 +186,7 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 unsigned int max_abs = 0; //Contiendra le max abs
 	 unsigned int index_max_score_line=0; //Contiendra l index de la ligne ou est situe le max relatif au gap
 	 unsigned int index_max_score_column=0 ; //Contiendra l index de la colonne ou est situe le max relatif au gap
+
 	 int score_left_gap = 0;
 	 int score_up_gap = 0 ;
 	 
@@ -180,7 +194,8 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 int* residu_query;
 	 char* residu_database ;
 	 int score_saved;
-	 for(unsigned int index=0; index<7000; ++index) //Essais sur i prot de la database (size : database->get_database_size())
+	 
+	 for(unsigned int index=identifier; index<database->get_database_size(); index+=NUMBER_OF_THREAD) //Essais sur i prot de la database (size : database->get_database_size())
 	 {
 		 
 		//Initialisation des variables non constante entre chaque test de protein
@@ -229,7 +244,9 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 			vect_database_prot_tested = NULL;
 		}
 		
+		mutex_score.lock() ;
 		locate_replace_max( index, floor((0.267*max_abs +3.34)/(log(2))), max_saved, index_max_saved); //Sbit = (λ S - ln K)/ ln 2 avec λ = 0.267 et ln(k) = -3.34
+		mutex_score.unlock();
 		
 		for(unsigned int i=0;i<=size_prot_query; ++i)
 		{
@@ -242,10 +259,6 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 }
 	 
 	 
-	 this->display_max(max_saved, index_max_saved , database);
-
-	 
-	return 0;
 }
 
 int Smith_Waterman::max_over_zero(int up, int left, int diag) const
