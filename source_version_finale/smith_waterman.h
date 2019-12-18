@@ -5,11 +5,11 @@ using namespace std;
 class Smith_Waterman
 {
 private:
-	 //Permet de retrouver les valeurs necessaires à la construction de la matrice score 
-	vector<vector<int>>* blossum_matrix;  // Depend du prot_dictionnary pour la traduction de char to int
-	vector<int>* query_protein; // Contient la protéine à chercher dans la database qui sera traduite char->int avec le prot_dico de handle_database
+	 //Permet de retrouver les valeurs nécessaires à la construction de la matrice score 
+	vector<vector<int>>* blossum_matrix;  //Dépend du prot_dictionnary pour la traduction de char to int
+	vector<int>* query_protein; //Contient la protéine à chercher dans la database qui sera traduite char->int avec le prot_dico de handle_database
 	string* query_protein_header ;
-	int gap_opener ; // 11 par défaut, modifié si besoin par un set
+	int gap_opener ; //11 par défaut, modifié si besoin par un set
 	int gap_extension ; //1 par défaut, modifié si besoin par un set
 	
 	map<char,int> prot_dictionnary ; //Dictionnaire pour lire le int associé à chaque char
