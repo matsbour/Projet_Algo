@@ -50,16 +50,16 @@ public :
 	string fetch_prot_header(const unsigned int index);
 	
 	//Déclaration des getters
-	u_int32_t get_version();
-	u_int32_t get_database_type();
-	u_int32_t  get_title_length();
-	char* get_title();
-	u_int32_t  get_timestamp_length();
-	char* get_timestamp();
-	u_int32_t  get_numbers_of_sequence();
-	uint64_t get_numbers_of_residues();
-	u_int32_t  get_prot_max_length();
-	const unsigned int get_database_size();
+	u_int32_t get_version() const;
+	u_int32_t get_database_type() const;
+	u_int32_t  get_title_length() const;
+	char* get_title() const;
+	u_int32_t  get_timestamp_length() const;
+	char* get_timestamp() const;
+	u_int32_t  get_numbers_of_sequence() const;
+	uint64_t get_numbers_of_residues() const;
+	u_int32_t  get_prot_max_length() const;
+	const unsigned int get_database_size() const;
 	const unsigned int get_size_sequence_prot(const unsigned int index);
 	
 
