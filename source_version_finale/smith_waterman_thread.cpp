@@ -69,8 +69,8 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 		
 		int start_line = 0;
 		vector<int> line_vect;
-		for(size_t i=0; i<28; ++i){line_vect.push_back(flag);} //on remplit le vect line
-		for(size_t i=0; i<28; ++i){blossum_matrix->at(i) = line_vect;} //on remplit le vect line
+		for(size_t i=0; i<28; ++i){line_vect.push_back(flag);} //on remplit les vecteurs lignes de 5000 pour pouvoir detecter quand une matrice n'a pas été touchée à la fin qd in a fini de remplir
+		for(size_t i=0; i<28; ++i){blossum_matrix->at(i) = line_vect;} //on remplit les vecteurs lignes
 		
 		
 		size_t compteur_residu = 0; // permet de savoir auxquelles nous sommes
@@ -120,10 +120,10 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 	{
 		for(size_t j=0;j<28;++j)
 		{
-			if(blossum_matrix->at(i).at(j)==flag)
+			if(blossum_matrix->at(i).at(j)==flag) //si il reste flag dans la matrice
 			{
-				if(i==j){blossum_matrix->at(i).at(j)=default_value_same;}
-				else{blossum_matrix->at(i).at(j)=default_value_different;}
+				if(i==j){blossum_matrix->at(i).at(j)=default_value_same;} //si on a 2 U : +1
+				else{blossum_matrix->at(i).at(j)=default_value_different;} //si on a U et autre chose: -4
 			}
 		}
 	}
@@ -135,12 +135,12 @@ unsigned int Smith_Waterman::setup_score_protein()
 {
 	this->display_information(database) ;
 	fill(index_max_saved, index_max_saved+NUMBER_OF_MAX_SAVED,0);
-	fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplis de 0
+	fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplit de 0
 	std::thread t0(&Smith_Waterman::score_protein, this,0);
 	std::thread t1(&Smith_Waterman::score_protein, this,1);
-	t0.join(); 
+	t0.join(); //pour que le thread principal ne continue pas pendant que les 2 sous threads calculent le score de la protéine
 	t1.join();
-	this->display_max(max_saved, index_max_saved , database);
+	this->display_max(max_saved, index_max_saved , database); //affiche le max 
 	
 }
 
@@ -165,13 +165,13 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 	 //Crée une matrice de score avec colonnes = protéine de la database et lignes = protein query qu'on veut comparer 
 	 unsigned int size_prot_database;
 	 const size_t size_prot_query = this->query_protein->size();
-	 vector<int> vect_l1 ; //stocke 1ere ligne
-	 vector<int> vect_l2 ;
-	 vector<int>* vect_saved; //Pointeur vers le vect qui stocke les valeurs de la ligne du dessus a celle calcule
+	 vector<int> vect_l1 ; //va stocker la 1ère ligne
+	 vector<int> vect_l2 ; //va stocker la 2ème ligne 
+	 vector<int>* vect_saved; //Pointeur vers le vecteur qui stocke les valeurs de la ligne du dessus a celle calculée
 	 vector<int> null_vector ;
 	 vector<int> line_constructed ;
 	 
-	 unsigned int index_max_column[size_prot_query+1];//Contiendra l index de la val a utilise pour les gap top
+	 unsigned int index_max_column[size_prot_query+1];//Contiendra l'index de la valeur à utiliser pour les gap top
 	 unsigned int max_score_column[size_prot_query+1];
 	 unsigned int index_max_line =0 ; // Contiendra la val max de la ligne a utiliser pour les gap left
 	 for(unsigned int i=0;i<=size_prot_query; ++i) // pas de seg fault
@@ -203,8 +203,8 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 		for(unsigned int i=1; i<=size_prot_database; ++i)
 		{
 			residu_database = database->fetch_prot_sequence_residu(index,i-1);
-			if(i%2==0){vect_saved = &vect_l1 ;} //pair, l2 regarde dans l1 
-			else{vect_saved = &vect_l2 ;} //et inverse dans impair
+			if(i%2==0){vect_saved = &vect_l1 ;} //pair : ligne 2 regarde dans ligne 1 
+			else{vect_saved = &vect_l2 ;} //impair : ligne 1 regarde dans ligne 2
 			vect_database_prot_tested = &(this->blossum_matrix->at((int)(*residu_database))); 
 			line_constructed.push_back(0); //premiere colonne de la matrix =  zero
 			index_max_line = 0 ;
@@ -228,7 +228,7 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 				}
 											
 				//Check et changement d'index pour calculer les gap correctement
-				if(score_up_gap < (score_saved-this->gap_opener))
+				if(score_up_gap < (score_saved-this->gap_opener)) 
 				{	index_max_column[j] = i ;
 					max_score_column[j]=score_saved;}
 				if(score_left_gap < (score_saved-this->gap_opener)){ index_max_line=j;}
@@ -240,16 +240,18 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 			vect_database_prot_tested = NULL;
 		}
 		
-		mutex_score.lock() ;
+		mutex_score.lock() ; //un thread qui a acces à la fois
 		locate_replace_max( index, floor((0.267*max_abs +3.34)/(log(2))), max_saved, index_max_saved); //Sbit = (λ S - ln K)/ ln 2 avec λ = 0.267 et ln(k) = -3.34
 		mutex_score.unlock();
-		
+		 
+		 
+	//Réinitialise les valeurs pour passer d'une protéine à l'autre	
 		for(unsigned int i=0;i<=size_prot_query; ++i)
 		{
 			index_max_column[i] = 0;
 			max_score_column[i] = 0;
 		}
-	    //Important pour passer de prot en prot
+	
 		vect_l1 = null_vector ;
 		vect_l2 = null_vector ;
 	 }
