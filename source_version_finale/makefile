@@ -4,7 +4,7 @@ Flag = -std=c++11 -lpthread -O2 -Wall -Ofast #-O2 est une optimisation
 all: main
 
 main: handle_database.o myProtein.o smith_waterman.o main.o
-	g++ ${Flag} -o main handle_database.o myProtein.o smith_waterman.o main.o
+	g++ ${Flag} -o projet handle_database.o myProtein.o smith_waterman.o main.o
 	
 main.o:
 	g++ ${Flag} -c main.cpp
@@ -20,7 +20,7 @@ smith_waterman.o: smith_waterman.h smith_waterman.cpp
 
 
 thread: handle_database.o myProtein.o smith_waterman_thread.o main_thread.o
-	g++ ${Flag} -o thread handle_database.o myProtein.o smith_waterman_thread.o main_thread.o
+	g++ ${Flag} -o projet_thread handle_database.o myProtein.o smith_waterman_thread.o main_thread.o
 
 main_thread.o:
 	g++ ${Flag} -c main_thread.cpp
