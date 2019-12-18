@@ -50,11 +50,11 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 		blossum_matrix->at(i).resize(28);
 
 	string container;
-	vector<int> order_of_residu;
+	vector<int> order_of_residu; //permet de remplir la matrice blosum dans l'ordre des résidus
 	ifstream file(filepath, std::ifstream::binary);
 	if(file.is_open())
 	{
-		while(getline(file,container))// permet d eviter les premieres ligne
+		while(getline(file,container))// permet d'éviter les premières lignes
 		{
 			if(container[0]!= '#') //ne prend pas en compte les 6 premières lignes du fichier BLOSUM62
 			{
@@ -138,7 +138,7 @@ unsigned int Smith_Waterman::setup_score_protein()
 	fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplis de 0
 	std::thread t0(&Smith_Waterman::score_protein, this,0);
 	std::thread t1(&Smith_Waterman::score_protein, this,1);
-	t0.join();
+	t0.join(); 
 	t1.join();
 	this->display_max(max_saved, index_max_saved , database);
 	
@@ -165,7 +165,7 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 	 //Crée une matrice de score avec colonnes = protéine de la database et lignes = protein query qu'on veut comparer 
 	 unsigned int size_prot_database;
 	 const size_t size_prot_query = this->query_protein->size();
-	 vector<int> vect_l1 ;
+	 vector<int> vect_l1 ; //stocke 1ere ligne
 	 vector<int> vect_l2 ;
 	 vector<int>* vect_saved; //Pointeur vers le vect qui stocke les valeurs de la ligne du dessus a celle calcule
 	 vector<int> null_vector ;
@@ -174,7 +174,7 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 	 unsigned int index_max_column[size_prot_query+1];//Contiendra l index de la val a utilise pour les gap top
 	 unsigned int max_score_column[size_prot_query+1];
 	 unsigned int index_max_line =0 ; // Contiendra la val max de la ligne a utiliser pour les gap left
-	 for(unsigned int i=0;i<=size_prot_query; ++i)
+	 for(unsigned int i=0;i<=size_prot_query; ++i) // pas de seg fault
 	 {
 		 null_vector.push_back(0);
 		 index_max_column[i]=0;
@@ -184,8 +184,6 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 	 }
 	 
 	 unsigned int max_abs = 0; //Contiendra le max abs
-	 unsigned int index_max_score_line=0; //Contiendra l index de la ligne ou est situe le max relatif au gap
-	 unsigned int index_max_score_column=0 ; //Contiendra l index de la colonne ou est situe le max relatif au gap
 
 	 int score_left_gap = 0;
 	 int score_up_gap = 0 ;
@@ -205,8 +203,8 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 		for(unsigned int i=1; i<=size_prot_database; ++i)
 		{
 			residu_database = database->fetch_prot_sequence_residu(index,i-1);
-			if(i%2==0){vect_saved = &vect_l1 ;}
-			else{vect_saved = &vect_l2 ;}
+			if(i%2==0){vect_saved = &vect_l1 ;} //pair, l2 regarde dans l1 
+			else{vect_saved = &vect_l2 ;} //et inverse dans impair
 			vect_database_prot_tested = &(this->blossum_matrix->at((int)(*residu_database))); 
 			line_constructed.push_back(0); //premiere colonne de la matrix =  zero
 			index_max_line = 0 ;
@@ -227,11 +225,9 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 				if(max_abs < score_saved) // mise a jour du maximum
 				{
 					max_abs = score_saved ;
-					index_max_score_line = i;
-					index_max_score_column = j;
 				}
 											
-				//Check et changement d index pour calculer les gap correctement
+				//Check et changement d'index pour calculer les gap correctement
 				if(score_up_gap < (score_saved-this->gap_opener))
 				{	index_max_column[j] = i ;
 					max_score_column[j]=score_saved;}
