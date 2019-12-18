@@ -178,8 +178,6 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 }
 	 
 	 unsigned int max_abs = 0; //Contiendra le max absolu
-	 unsigned int index_max_score_line=0; //Contiendra l'index de la ligne où est situé le max relatif au gap
-	 unsigned int index_max_score_column=0 ; //Contiendra l index de la colonne où est situé le max relatif au gap
 	 int score_left_gap = 0;
 	 int score_up_gap = 0 ;
 	 
@@ -219,11 +217,9 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 				
 				line_constructed.push_back(score_saved);
 				
-				if(max_abs < score_saved) // mise a jour du maximum
+				if((int) max_abs < score_saved) // mise a jour du maximum
 				{
 					max_abs = score_saved ;
-					index_max_score_line = i;
-					index_max_score_column = j;
 				}
 											
 				//Check et changement d'index pour calculer les gap correctement
