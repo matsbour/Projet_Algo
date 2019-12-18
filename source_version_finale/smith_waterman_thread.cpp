@@ -136,14 +136,14 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 
 unsigned int Smith_Waterman::setup_score_protein()
 {
-	this->display_information(database) ;
+	this->display_information() ;
 	fill(index_max_saved, index_max_saved+NUMBER_OF_MAX_SAVED,0);
 	fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplit de 0
 	std::thread t0(&Smith_Waterman::score_protein, this,0);
 	std::thread t1(&Smith_Waterman::score_protein, this,1);
 	t0.join(); //pour que le thread principal ne continue pas pendant que les 2 sous threads calculent le score de la protéine
 	t1.join();
-	this->display_max(max_saved, index_max_saved , database); //affiche le max 
+	this->display_max(); //affiche le max 
 	
 }
 
@@ -308,7 +308,7 @@ void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned 
 void Smith_Waterman::set_gap_opener(const unsigned int new_gap_opener){this->gap_opener=new_gap_opener;}
 void Smith_Waterman::set_gap_extension(const unsigned int new_gap_extension){this->gap_extension = new_gap_extension;}
 
-const void Smith_Waterman::display_information(Handle_Database* database)
+void Smith_Waterman::display_information() const
 {
 	
 	/**
@@ -344,7 +344,7 @@ const void Smith_Waterman::display_information(Handle_Database* database)
 	
 }
 
-const void Smith_Waterman::display_max(unsigned int* max_saved, unsigned int* index_max_saved, Handle_Database* database)
+void Smith_Waterman::display_max() const
 {
 	/**
 	* @desc affiche les protéines ayant les meilleurs scores
