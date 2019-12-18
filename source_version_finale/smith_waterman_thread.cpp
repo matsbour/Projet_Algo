@@ -140,7 +140,7 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 	file.close();
 }
 
-unsigned int Smith_Waterman::setup_score_protein()
+void Smith_Waterman::setup_score_protein()
 {
 	this->display_information() ;
 	fill(index_max_saved, index_max_saved+NUMBER_OF_MAX_SAVED,0);
