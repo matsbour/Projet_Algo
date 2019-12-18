@@ -185,7 +185,7 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 int* residu_query;
 	 char* residu_database ;
 	 int score_saved;
-	 for(unsigned int index=0; index<7000; ++index) //Essais sur i prot de la database (size : database->get_database_size())
+	 for(unsigned int index=0; index<database->get_database_size(); ++index) //Essais sur i prot de la database (size : database->get_database_size())
 	 {
 		 
 		//Initialisation des variables non constantes entre chaque test de protein
