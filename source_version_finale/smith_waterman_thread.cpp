@@ -234,7 +234,7 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 				
 				line_constructed.push_back(score_saved);
 				
-				if(max_abs < score_saved) //mise à jour du maximum
+				if((int) max_abs < score_saved) //mise à jour du maximum
 				{
 					max_abs = score_saved ;
 				}
