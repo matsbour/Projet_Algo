@@ -19,8 +19,8 @@ private:
 	//Fonction privée
 	void build_blossum_matrix(const string filepath);//Fct appelée dans le constructeur et remplit la matrix blosum
 	void locate_replace_max(const unsigned int index,const unsigned int value, unsigned int max_table[], unsigned int index_max_table[]) ;
-	const void display_information(Handle_Database* database);
-	const void display_max(unsigned int* max_saved, unsigned int* index_max_saved, Handle_Database* database);
+	void display_information() const;
+	void display_max() const;
 	int max_over_zero(int up, int left, int diag) const;
 	
 public:
