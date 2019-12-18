@@ -34,7 +34,7 @@ char* Handle_Database::read_file(const string filepath)
 	/**
 	* @desc lit un fichier et stocke les caractères du fichier 
 	* @param string : chemin d'accès du fichier
-	* @return char_container : ??
+	* @return char_container : pointeur vers une chaine de caractères 
 	**/
 	
 	ifstream file(filepath, ios::in | ios::binary);
@@ -44,7 +44,7 @@ char* Handle_Database::read_file(const string filepath)
 		file.seekg(0,file.end);
 		int length = file.tellg(); //Nombre de charactères dans le fichier à lire
 		file.seekg(0,file.beg);
-		char_container = new char [length] ; //servira a stocker tous les char du fichier
+		char_container = new char [length] ; //servira à stocker tous les char du fichier
 		file.read(char_container,length);
 		file.close();
 	}
@@ -55,7 +55,7 @@ char* Handle_Database::read_file(const string filepath)
 	return char_container;
 }
 
-//Renvoie la taille de ???
+//Renvoie la taille de la database
 const unsigned int Handle_Database::get_database_size() const{return (this->sequence_offset_vector->size()-1);}
 
 const unsigned int Handle_Database::get_size_sequence_prot(const unsigned int index)
@@ -119,14 +119,14 @@ void Handle_Database::generate_prot_index(string filepath)
 		file.read((char*)&prot_max_length,sizeof(uint32_t)); //longueur de la plus longue séquence dans la database
 		prot_max_length = __builtin_bswap32(prot_max_length);
 		 
-		u_int32_t* header_offset = new u_int32_t[(int)numbers_of_sequence+1] ; // Tableau d offset representant l ecart entre chaque header
+		u_int32_t* header_offset = new u_int32_t[(int)numbers_of_sequence+1] ; // Tableau d'offset représentant l'écart entre chaque header
 		for(int i=0; i<(int)numbers_of_sequence+1;++i)
 		{
 			file.read((char*)&(header_offset[i]),sizeof(uint32_t));
 			header_offset_vector->push_back((int)__builtin_bswap32(header_offset[i]));
 		}
 	
-		u_int32_t* sequence_offset = new u_int32_t[(int)numbers_of_sequence+1] ; // Tableau d offset representant l ecart entre chaque sequence
+		u_int32_t* sequence_offset = new u_int32_t[(int)numbers_of_sequence+1] ; // Tableau d'offset représentant l'écart entre chaque séquence
 		for(int i=0; i<(int)numbers_of_sequence+1;++i)
 		{
 			file.read((char*)&(sequence_offset[i]),sizeof(uint32_t));
@@ -143,9 +143,9 @@ void Handle_Database::generate_prot_index(string filepath)
 char* Handle_Database::fetch_prot_sequence_residu(const unsigned int index, const unsigned int offset)
 { 
 	/**
-	* @desc 
-	* @param 
-	* @return 
+	* @desc détermine la séquence de résidus de la protéine
+	* @param int : un index et un offset
+	* @return séquence des résidus de la protéine
 	**/
 	
 	if(index > this->sequence_offset_vector->size()) //on vérifie si on a un numéro de prot trop grand, dépassement de tampon
@@ -160,9 +160,9 @@ char* Handle_Database::fetch_prot_sequence_residu(const unsigned int index, cons
 string Handle_Database::fetch_prot_header(const unsigned int index)
 {
 	/**
-	* @desc 
+	* @desc détermine le header de la protéine
 	* @param int : un index 
-	* @return 
+	* @return value_return : header de la protéine
 	**/
 	
 	if(index >= this->header_offset_vector->size()) //on vérifie si on a un numéro de protéine trop grand, dépassement de tampon
