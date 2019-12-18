@@ -15,4 +15,5 @@
                                                                   - Un unsigned int gap_extension, si un nombre négatif est donné alors il sera ignoré et la valeur 
                                                                     de base sera de 1
 
-    2. Le projet en multithreading prend les mêmes 5 paramètres (2 obligatoires et 3 optionnels), le nombre de threads est défini en temps que variable globale dans le code.
+    2. Le projet en multithreading prend les mêmes 5 paramètres (2 obligatoires et 3 optionnels), le nombre de threads est défini en temps que variable globale dans
+    le fichier smith-waterman-thread.cpp (il faut également ajouter des thread si on veut augmenter ce nombre).
