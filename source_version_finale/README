@@ -9,11 +9,10 @@
     1. Le projet standard prend deux parametres obligatoires : -Chemin vers la database en format fasta
                                                                -Chemin vers la proteine query en format fasta
 
-       Il peut prendre dans l'ordre trois parametres optionnels : - Chemin vers une matrice Blosum, si chaine '1' est donnee alors la Blosum62 est la matrice choisis
+       Il peut prendre dans l'ordre trois paramètres optionnels : - Chemin vers une matrice Blosum, si chaine '1' est donnee alors la Blosum62 est la matrice choisis
 	                                                              - Un unsigned int gap_opener, si un nombre négatif est donné alors il sera ignoré et la valeur 
                                                                     sera de 11
                                                                   - Un unsigned int gap_extension, si un nombre négatif est donné alors il sera ignoré et la valeur 
                                                                     de base sera de 1
 
-    2. Le projet en multithreading prend les même 5 premiers parametres (2 obligtoire et 3 optionnels) mais il prend un dernier parametre optionnel qui est le nombre 
-       de thread qui seront lancés durant l'éxécution.
+    2. Le projet en multithreading prend les mêmes 5 paramètres (2 obligatoires et 3 optionnels), le nombre de threads est défini en temps que variable globale dans le code.
