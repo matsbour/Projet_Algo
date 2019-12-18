@@ -30,7 +30,7 @@ public:
 	
 	// Permet de retourner le score d'une protéine de la database comparée à celle de la query
 	void score_protein(int identifier);
-	unsigned int setup_score_protein();
+	void setup_score_protein();
 	
 	//Setters
 	void set_gap_opener(const unsigned int new_gap_opener);
