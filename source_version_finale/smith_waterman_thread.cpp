@@ -3,7 +3,7 @@
 //Constante :
 const size_t NUMBER_OF_MAX_SAVED = 10 ; //nombre de maximum sauvegardés, valeur constante 
 const size_t NUMBER_OF_THREAD = 2 ; //Nombre de threads effectifs
-std::mutex mutex_score; //Permet d'assurer le contrôle sur les ressources partagées
+std::mutex mutex_score; //Permet d'assurer le contrôle sur les ressources partagées avec .lock() et .unlock()
 unsigned int max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra dans l'ordre décroissant les meilleurs scores normalisés
 unsigned int index_max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra l'index des protéines avec un bon score normalisé
 
@@ -43,7 +43,13 @@ Smith_Waterman::~Smith_Waterman()
 
 void Smith_Waterman::build_blossum_matrix(const string filepath) 
 {
-	int flag = 5000; // Sert a remplir la matrice de base
+	
+	/*
+	* @desc construit la matrice blosum
+	* @param string : le chemin d'accès du fichier
+	 * */
+	
+	int flag = 5000; //Sert à remplir la matrice de base
 	this->blossum_matrix = new vector<vector<int>>();
 	blossum_matrix->resize(28); //28 si uniquement des matrices blosum et il y a 28 éléments dans le prot_dictionnary
 	for (int i = 0; i<28; i++)
@@ -125,8 +131,8 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 		{
 			if(blossum_matrix->at(i).at(j)==flag) //s'il reste flag dans la matrice
 			{
-				if(i==j){blossum_matrix->at(i).at(j)=default_value_same;} //si on a 2 U : +1
-				else{blossum_matrix->at(i).at(j)=default_value_different;} //si on a U et autre chose: -4
+				if(i==j){blossum_matrix->at(i).at(j)=default_value_same;} //ex : si on a 2 U : +1
+				else{blossum_matrix->at(i).at(j)=default_value_different;} //ex : si on a U et un autre résidu: -4
 			}
 		}
 	}
@@ -216,21 +222,25 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 			{
 				residu_query = &(this->query_protein->at(j-1));
 				
+				//calcul du score de la case en haut 
 				score_up_gap = max_score_column[j] - this->gap_opener - (i-index_max_column[j])*(this->gap_extension);
+				
+				//calcul du score à gauche
 				score_left_gap = line_constructed[index_max_line] - this->gap_opener - (j-index_max_line)*(this->gap_extension);
 				
-
+				//sauvegarde le score le plus grand entre ceux obtenus à gauche, en haut et en diagonale
 				score_saved = this->max_over_zero(score_left_gap, score_up_gap, 
 						 vect_database_prot_tested->at(*residu_query)+vect_saved->at(j-1)) ; 
 				
 				line_constructed.push_back(score_saved);
 				
-				if(max_abs < score_saved) // mise a jour du maximum
+				if(max_abs < score_saved) //mise à jour du maximum
 				{
 					max_abs = score_saved ;
 				}
 											
 				//Check et changement d'index pour calculer les gap correctement
+				//vérifie si le score sauvegardé diminué de son gap opener est plus intéressant que le score du haut
 				if(score_up_gap < (score_saved-this->gap_opener)) 
 				{	index_max_column[j] = i ;
 					max_score_column[j]=score_saved;}
@@ -243,7 +253,7 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 			vect_database_prot_tested = NULL;
 		}
 		
-		mutex_score.lock() ; //un thread qui a acces à la fois
+		mutex_score.lock() ; //chaque thread à accès aux données un à la fois
 		locate_replace_max( index, floor((0.267*max_abs +3.34)/(log(2))), max_saved, index_max_saved); //Sbit = (λ S - ln K)/ ln 2 avec λ = 0.267 et ln(k) = -3.34
 		mutex_score.unlock();
 		 
