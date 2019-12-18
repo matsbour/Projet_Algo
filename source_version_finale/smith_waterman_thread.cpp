@@ -2,7 +2,7 @@
 
 //Constante :
 const size_t NUMBER_OF_MAX_SAVED = 10 ; //nombre de maximum sauvegardés, valeur constante 
-const size_t NUMBER_OF_THREAD = 2 ; //Nombre de threads effectifs
+const size_t NUMBER_OF_THREAD = 4 ; //Nombre de threads effectifs
 std::mutex mutex_score; //Permet d'assurer le contrôle sur les ressources partagées avec .lock() et .unlock()
 unsigned int max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra dans l'ordre décroissant les meilleurs scores normalisés
 unsigned int index_max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra l'index des protéines avec un bon score normalisé
@@ -147,8 +147,12 @@ void Smith_Waterman::setup_score_protein()
 	fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplit de 0
 	std::thread t0(&Smith_Waterman::score_protein, this,0);
 	std::thread t1(&Smith_Waterman::score_protein, this,1);
+	std::thread t2(&Smith_Waterman::score_protein, this,2);
+	std::thread t3(&Smith_Waterman::score_protein, this,3);
 	t0.join(); //pour que le thread principal ne continue pas pendant que les 2 sous threads calculent le score de la protéine
 	t1.join();
+	t2.join();
+	t3.join();
 	this->display_max(); //affiche le max 
 	
 }
