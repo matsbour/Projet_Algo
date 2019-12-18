@@ -69,7 +69,9 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 		
 		int start_line = 0;
 		vector<int> line_vect;
-		for(size_t i=0; i<28; ++i){line_vect.push_back(flag);} //on remplit les vecteurs lignes de 5000 pour pouvoir detecter quand une matrice n'a pas été touchée à la fin qd in a fini de remplir
+		
+		//on remplit les vecteurs lignes par un flag pour pouvoir detecter quand une case de la matrice n'a pas été touchée à la fin qd on a fini de la remplir
+		for(size_t i=0; i<28; ++i){line_vect.push_back(flag);} 
 		for(size_t i=0; i<28; ++i){blossum_matrix->at(i) = line_vect;} //on remplit les vecteurs lignes
 		
 		
@@ -82,22 +84,22 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 			{
 				if(container[i]!=' ')
 				{
-					if(container[i]=='-') // si nb negatif
+					if(container[i]=='-') //si nombre négatif
 					{
-						//Attention convertion char to int mais valeur pas code ascii : (int)char - (int) '0'	
+						//Attention convertion char to int mais valeur en code ascii : (int)char - (int) '0' pour avoir le nombre réel	
 						line_vect[order_of_residu[compteur_residu]] = ((-1)*((int)container[i+1] - (int)'0'));		
 						++i;
 						++compteur_residu; // Passe au residu suivant 
 					}
-					else//nb a regarder positif
+					else//si nombre positif
 					{
-						if(container[i+1]!=' ') // A cause de 11 pour W deux characters
+						if(container[i+1]!=' ') // A cause de W qui correspond à 11 donc 2 caractères
 						{
 							line_vect[order_of_residu[compteur_residu]] = (((int)container[i]-(int)'0')*10) + ((int)(container[i+1])- (int)'0' );
 							++i;
 						}
 						else{line_vect[order_of_residu[compteur_residu]] = ((int)container[i] - (int)'0');}
-						++compteur_residu; // Passe au residu suivant 
+						++compteur_residu; // Passe au résidu suivant 
 					}
 				}
 			}
@@ -109,7 +111,8 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 	cout<<"Cannot open file : ["<< filepath << "] in order to create the blossum matrix" <<endl;
 	exit(1);}
 	
-	int default_value_different = 0 ;//Value qui sert a remplir les cas X:*
+	//on reparcourt la matrice pour voir où il y a des flag restants
+	int default_value_different = 0 ;//Value qui sert à remplir les cas X:*
 	for(size_t i=0;i<28;++i)
 	{
 		default_value_different = blossum_matrix->at(prot_dictionnary['*']).at(i); // valeur de X:*
@@ -120,7 +123,7 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 	{
 		for(size_t j=0;j<28;++j)
 		{
-			if(blossum_matrix->at(i).at(j)==flag) //si il reste flag dans la matrice
+			if(blossum_matrix->at(i).at(j)==flag) //s'il reste flag dans la matrice
 			{
 				if(i==j){blossum_matrix->at(i).at(j)=default_value_same;} //si on a 2 U : +1
 				else{blossum_matrix->at(i).at(j)=default_value_different;} //si on a U et autre chose: -4
@@ -173,8 +176,8 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 	 
 	 unsigned int index_max_column[size_prot_query+1];//Contiendra l'index de la valeur à utiliser pour les gap top
 	 unsigned int max_score_column[size_prot_query+1];
-	 unsigned int index_max_line =0 ; // Contiendra la val max de la ligne a utiliser pour les gap left
-	 for(unsigned int i=0;i<=size_prot_query; ++i) // pas de seg fault
+	 unsigned int index_max_line =0 ; //Contiendra la val max de la ligne à utiliser pour les gap left
+	 for(unsigned int i=0;i<=size_prot_query; ++i) //pour éviter les seg fault
 	 {
 		 null_vector.push_back(0);
 		 index_max_column[i]=0;
@@ -183,7 +186,7 @@ void Smith_Waterman::score_protein(int identifier) //Handle_Database* database
 		 vect_l2.push_back(0);
 	 }
 	 
-	 unsigned int max_abs = 0; //Contiendra le max abs
+	 unsigned int max_abs = 0; //Contiendra le max absolu
 
 	 int score_left_gap = 0;
 	 int score_up_gap = 0 ;
