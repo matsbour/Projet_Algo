@@ -56,7 +56,7 @@ char* Handle_Database::read_file(const string filepath)
 }
 
 //Renvoie la taille de ???
-const unsigned int Handle_Database::get_database_size(){return (this->sequence_offset_vector->size()-1);}
+const unsigned int Handle_Database::get_database_size() const{return (this->sequence_offset_vector->size()-1);}
 
 const unsigned int Handle_Database::get_size_sequence_prot(const unsigned int index)
 {	
@@ -249,12 +249,12 @@ unsigned int Handle_Database::number_of_character(unsigned int* position_in_head
 
 
 //Définition des getters
-u_int32_t Handle_Database::get_version(){return version;}
-u_int32_t Handle_Database::get_database_type(){return database_type;}
-u_int32_t  Handle_Database::get_title_length(){return title_length;}
-char* Handle_Database::get_title(){return title;}
-u_int32_t  Handle_Database::get_timestamp_length(){return timestamp_length;}
-char* Handle_Database::get_timestamp(){return timestamp;}
-u_int32_t  Handle_Database::get_numbers_of_sequence(){return numbers_of_sequence;}
-uint64_t Handle_Database::get_numbers_of_residues(){return this->numbers_of_residues;}
-u_int32_t  Handle_Database::get_prot_max_length(){return prot_max_length;}
+u_int32_t Handle_Database::get_version() const{return version;}
+u_int32_t Handle_Database::get_database_type() const{return database_type;}
+u_int32_t  Handle_Database::get_title_length() const{return title_length;}
+char* Handle_Database::get_title() const{return title;}
+u_int32_t  Handle_Database::get_timestamp_length() const{return timestamp_length;}
+char* Handle_Database::get_timestamp() const{return timestamp;}
+u_int32_t  Handle_Database::get_numbers_of_sequence() const{return numbers_of_sequence;}
+uint64_t Handle_Database::get_numbers_of_residues() const{return this->numbers_of_residues;}
+u_int32_t  Handle_Database::get_prot_max_length() const{return prot_max_length;}
