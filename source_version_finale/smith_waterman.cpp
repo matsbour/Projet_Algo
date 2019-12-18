@@ -1,6 +1,6 @@
 #include "smith_waterman.h"
 
-//Constante :
+//Constantes :
 const size_t NUMBER_OF_MAX_SAVED = 10 ; //nombre de maximum sauvegardés, valeur constante 
 
 Smith_Waterman::Smith_Waterman(const string filepath,myProtein* query_protein_ini, int gap_opener_penalty, int gap_extension_penalty )
