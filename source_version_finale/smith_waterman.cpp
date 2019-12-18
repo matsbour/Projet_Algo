@@ -39,18 +39,18 @@ Smith_Waterman::~Smith_Waterman()
 void Smith_Waterman::build_blossum_matrix(const string filepath) 
 {
 	/*
-	* @desc 
-	* @param 
-	**//
+	* @desc construit la matrice blosum
+	* @param string : le chemin d'accès du fichier
+	 * */
 	
-	int flag = 5000; // Sert a remplir la matrice de base
+	int flag = 5000; //Sert à remplir la matrice de base
 	this->blossum_matrix = new vector<vector<int>>();
 	blossum_matrix->resize(28); //28 si uniquement des matrices blosum et il y a 28 éléments dans le prot_dictionnary
 	for (int i = 0; i<28; i++)
 		blossum_matrix->at(i).resize(28);
 
 	string container;
-	vector<int> order_of_residu;
+	vector<int> order_of_residu; //permet de remplir la matrice blosum dans l'ordre des résidus
 	ifstream file(filepath, std::ifstream::binary);
 	if(file.is_open())
 	{
@@ -69,7 +69,9 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 		
 		int start_line = 0;
 		vector<int> line_vect;
-		for(size_t i=0; i<28; ++i){line_vect.push_back(flag);} //on remplit le vect line
+		
+		//on remplit les vecteurs lignes par un flag pour pouvoir detecter quand une case de la matrice n'a pas été touchée à la fin qd on a fini de la remplir
+		for(size_t i=0; i<28; ++i){line_vect.push_back(flag);}
 		for(size_t i=0; i<28; ++i){blossum_matrix->at(i) = line_vect;} //on remplit le vect line
 		
 		
@@ -82,7 +84,7 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 			{
 				if(container[i]!=' ')
 				{
-					if(container[i]=='-') // si nb negatif
+					if(container[i]=='-') //si nombre négatif
 					{
 						//Attention convertion char to int mais valeur pas code ascii : (int)char - (int) '0'	
 						line_vect[order_of_residu[compteur_residu]] = ((-1)*((int)container[i+1] - (int)'0'));		
@@ -91,7 +93,7 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 					}
 					else//nb a regarder positif
 					{
-						if(container[i+1]!=' ') // A cause de 11 pour W deux characters
+						if(container[i+1]!=' ') // A cause de W qui correspond à 11 donc 2 caractères
 						{
 							line_vect[order_of_residu[compteur_residu]] = (((int)container[i]-(int)'0')*10) + ((int)(container[i+1])- (int)'0' );
 							++i;
@@ -109,6 +111,7 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 	cout<<"Cannot open file : ["<< filepath << "] in order to create the blossum matrix" <<endl;
 	exit(1);}
 	
+	//on reparcourt la matrice pour voir où il y a des flag restants
 	int default_value_different = 0 ;//Value qui sert a remplir les cas X:*
 	for(size_t i=0;i<28;++i)
 	{
@@ -120,10 +123,10 @@ void Smith_Waterman::build_blossum_matrix(const string filepath)
 	{
 		for(size_t j=0;j<28;++j)
 		{
-			if(blossum_matrix->at(i).at(j)==flag)
+			if(blossum_matrix->at(i).at(j)==flag) //s'il reste flag dans la matrice
 			{
-				if(i==j){blossum_matrix->at(i).at(j)=default_value_same;}
-				else{blossum_matrix->at(i).at(j)=default_value_different;}
+				if(i==j){blossum_matrix->at(i).at(j)=default_value_same;} //ex : si on a 2 U : +1
+				else{blossum_matrix->at(i).at(j)=default_value_different;} //ex : si on a U et un autre résidu: -4
 			}
 		}
 	}
@@ -153,18 +156,18 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 //Crée une matrice de score avec colonnes = protéine de la database et lignes = protein query qu'on veut comparer 
 	 unsigned int size_prot_database;
 	 const size_t size_prot_query = this->query_protein->size();
-	 vector<int> vect_l1 ;
-	 vector<int> vect_l2 ;
-	 vector<int>* vect_saved; //Pointeur vers le vect qui stocke les valeurs de la ligne du dessus a celle calcule
+	 vector<int> vect_l1 ; //va stocker la 1ère ligne
+	 vector<int> vect_l2 ; //va stocker la 2ème ligne
+	 vector<int>* vect_saved; //Pointeur vers le vecteur qui stocke les valeurs de la ligne du dessus a celle calculée
 	 vector<int> null_vector ;
 	 vector<int> line_constructed ;
-	 unsigned int max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra dans l ordre decroissant les meilleurs scores normalise
-	 unsigned int index_max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra l index des proteines avec un bon score normalise
+	 unsigned int max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra dans l'ordre décroissant des meilleurs scores normalisés
+	 unsigned int index_max_saved[NUMBER_OF_MAX_SAVED]; //Contiendra l'index des protéines avec un bon score normalisé
 	 fill(index_max_saved, index_max_saved+NUMBER_OF_MAX_SAVED,0);
-	 fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplis de 0
-	 unsigned int index_max_column[size_prot_query+1];//Contiendra l index de la val a utilise pour les gap top
+	 fill(max_saved, max_saved+NUMBER_OF_MAX_SAVED,0); //remplit de 0
+	 unsigned int index_max_column[size_prot_query+1];//Contiendra l'index de la val à utiliser pour les gap top
 	 unsigned int max_score_column[size_prot_query+1];
-	 unsigned int index_max_line =0 ; // Contiendra la val max de la ligne a utiliser pour les gap left
+	 unsigned int index_max_line =0 ; // Contiendra la val max de la ligne à utiliser pour les gap left
 	 for(unsigned int i=0;i<=size_prot_query; ++i)
 	 {
 		 null_vector.push_back(0);
@@ -174,9 +177,9 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 		 vect_l2.push_back(0);
 	 }
 	 
-	 unsigned int max_abs = 0; //Contiendra le max abs
-	 unsigned int index_max_score_line=0; //Contiendra l index de la ligne ou est situe le max relatif au gap
-	 unsigned int index_max_score_column=0 ; //Contiendra l index de la colonne ou est situe le max relatif au gap
+	 unsigned int max_abs = 0; //Contiendra le max absolu
+	 unsigned int index_max_score_line=0; //Contiendra l'index de la ligne où est situé le max relatif au gap
+	 unsigned int index_max_score_column=0 ; //Contiendra l index de la colonne où est situé le max relatif au gap
 	 int score_left_gap = 0;
 	 int score_up_gap = 0 ;
 	 
@@ -187,15 +190,15 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 	 for(unsigned int index=0; index<7000; ++index) //Essais sur i prot de la database (size : database->get_database_size())
 	 {
 		 
-		//Initialisation des variables non constante entre chaque test de protein
+		//Initialisation des variables non constantes entre chaque test de protein
 		size_prot_database = database->get_size_sequence_prot(index);
 		max_abs = 0 ;
 		
 		for(unsigned int i=1; i<=size_prot_database; ++i)
 		{
 			residu_database = database->fetch_prot_sequence_residu(index,i-1);
-			if(i%2==0){vect_saved = &vect_l1 ;}
-			else{vect_saved = &vect_l2 ;}
+			if(i%2==0){vect_saved = &vect_l1 ;} //pair : ligne 2 regarde dans ligne 1 
+			else{vect_saved = &vect_l2 ;} //impair : ligne 1 regarde dans ligne 2
 			vect_database_prot_tested = &(this->blossum_matrix->at((int)(*residu_database))); 
 			line_constructed.push_back(0); //premiere colonne de la matrix =  zero
 			index_max_line = 0 ;
@@ -204,10 +207,13 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 			{
 				residu_query = &(this->query_protein->at(j-1));
 				
+				//calcul du score de la case en haut 
 				score_up_gap = max_score_column[j] - this->gap_opener - (i-index_max_column[j])*(this->gap_extension);
+				
+				//calcul du score à gauche
 				score_left_gap = line_constructed[index_max_line] - this->gap_opener - (j-index_max_line)*(this->gap_extension);
 				
-
+				//sauvegarde le score le plus grand entre ceux obtenus à gauche, en haut et en diagonale
 				score_saved = this->max_over_zero(score_left_gap, score_up_gap, 
 						 vect_database_prot_tested->at(*residu_query)+vect_saved->at(j-1)) ; 
 				
@@ -220,7 +226,8 @@ unsigned int Smith_Waterman::score_protein(Handle_Database* database)
 					index_max_score_column = j;
 				}
 											
-				//Check et changement d index pour calculer les gap correctement
+				//Check et changement d'index pour calculer les gap correctement
+				//vérifie si le score sauvegardé diminué de son gap opener est plus intéressant que le score du haut
 				if(score_up_gap < (score_saved-this->gap_opener))
 				{	index_max_column[j] = i ;
 					max_score_column[j]=score_saved;}
@@ -273,7 +280,7 @@ void Smith_Waterman::locate_replace_max(const unsigned int index,const unsigned 
 {
 	
 	/**
-	* @desc  
+	* @desc place une valeur dans la tableau contenant les maximum 
 	* @param int : une valeur à comparer et son index, une valeur max d'un tableau et son index 
 	**/
 	
